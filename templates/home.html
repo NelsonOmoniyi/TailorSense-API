@@ -1,0 +1,13 @@
+{% include 'partials/head.html' %}
+
+<!-- Private home page shown after a successful login. -->
+<main>
+    <h1>Welcome to TailorSense</h1>
+    <p>You are signed in as {{ request.user.email|default:request.user.username }}.</p>
+    <form action="{% url 'signout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Sign Out</button>
+    </form>
+</main>
+
+{% include 'partials/footer.html' %}

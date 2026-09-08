@@ -6,6 +6,8 @@ urlpatterns = [
     path('', views.landing, name='landing'),
     # Protected destination available after login.
     path('home/', views.home, name='home'),
+    # End the current session and return to login.
+    path('signout/', views.signout, name='signout'),
 ]
 
 
