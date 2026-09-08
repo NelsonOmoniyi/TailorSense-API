@@ -1,32 +1,23 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TailorSense — a smart tailoring and fashion hub for modern, personalized fashion.">
-    <title>TailorSense | Smart Fashion, Tailored for You</title>
-    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
-</head>
+{% include 'partials/head.html' %}
 
 <body>
-    <!-- ==================== HEADER ==================== -->
-    <header class="site-header">
-        <a href="/" class="brand" aria-label="TailorSense home">
-            <img
-                src="{% static 'images/tailorsense-logo.png' %}"
-                alt="TailorSense"
-                class="brand-logo"
-            >
-        </a>
+   
+<header class="site-header">
+    <a href="/" class="brand" aria-label="TailorSense home">
+        <img
+            src="{% static 'images/tailorsense-logo.png' %}"
+            alt="TailorSense"
+            class="brand-logo"
+        >
+    </a>
 
-        <nav class="header-actions" aria-label="Main navigation">
-            <a href="/about-us/" class="nav-link">About Us</a>
-            <a href="/login/" class="nav-link">Login</a>
-            <a href="/signup/" class="nav-cta">Sign Up</a>
-        </nav>
-    </header>
-
+    <nav class="header-actions" aria-label="Main navigation">
+        <a href="/about-us/" class="nav-link">About Us</a>
+        <a href="{% url 'login' %}" class="nav-link">Login</a>
+        <a href="{% url 'register' %}" class="nav-cta">Sign Up</a>
+    </nav>
+</header>
     <main>
         <!-- ==================== HERO ==================== -->
         <section class="hero" aria-labelledby="hero-title">
@@ -53,7 +44,7 @@
                 </p>
 
                 <div class="hero-actions">
-                    <a href="/signup/" class="primary-btn">
+                    <a href="{% url 'register' %}" class="primary-btn">
                         Create Your Style
                         <span aria-hidden="true">→</span>
                     </a>
@@ -113,23 +104,6 @@
         </section>
     </main>
 
-    <!-- ==================== FOOTER ==================== -->
-    <footer class="site-footer">
-        <div class="footer-brand">
-            <a href="/" class="brand" aria-label="TailorSense home">
-            <img
-                src="{% static 'images/tailorsense-logo2.png' %}"
-                alt="TailorSense"
-                class="brand-logo"
-            >
-        </a>
-            <p>Smart fashion, tailored for you.</p>
-        </div>
-
-        <div class="footer-bottom">
-            <p>© 2026 TailorSense. All rights reserved.</p>
-            <span>Crafted for modern fashion.</span>
-        </div>
-    </footer>
+    {% include 'partials/footer.html' %}
 </body>
 </html>

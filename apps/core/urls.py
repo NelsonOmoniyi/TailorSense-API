@@ -2,8 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.landing, name='landing'), #default page
-    path('', views.home, name='home'), #after login
+    # Public page shown at the site root.
+    path('', views.landing, name='landing'),
+    # Protected destination available after login.
+    path('home/', views.home, name='home'),
 ]
 
 

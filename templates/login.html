@@ -1,0 +1,26 @@
+{% include 'partials/head.html' %}
+
+<!-- Login form for existing users. -->
+<main>
+    <h1>Log In</h1>
+    {% if error %}
+        <p role="alert">{{ error }}</p>
+    {% endif %}
+    <!-- Credentials are submitted to the named login route. -->
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        <button type="submit">Log In</button>
+    </form>
+    <!-- Direct new users to the registration page. -->
+    <p>Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
+</main>
+
+{% include 'partials/footer.html' %}

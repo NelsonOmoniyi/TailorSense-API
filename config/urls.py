@@ -16,11 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from apps.core import views
+from apps.users import views as user_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('apps.core.urls')), #TailorSense landing page
-    path('users/', include('apps.users.urls')),
+    # Public landing page and authenticated home routes.
+    path('', include('apps.core.urls')),
+    # Public account pages for registration and login.
+    path('register/', user_views.register, name='register'),
+    path('login/', user_views.login, name='login'),
 ]
 

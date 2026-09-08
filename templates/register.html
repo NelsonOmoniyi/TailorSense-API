@@ -1,0 +1,38 @@
+ {% include 'partials/head.html' %}
+
+<!-- Registration form for new users. -->
+<main>
+    <h1>Create An Account With Us</h1>
+    {% if error %}
+        <p role="alert">{{ error }}</p>
+    {% endif %}
+    <!-- New account details are submitted to the named registration route. -->
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="fullname">Full Name:</label> 
+            <input type="text" id="fullname" name="fullname" required maxlength="20">
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="phone">Phone Number:</label>
+            <input type="number" id="phone" name="phone" required maxlength="11">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <label for="repeat-password">Re-Enter Password:</label>
+            <input type="password" id="repeat-password" name="repeat_password" required>
+        </div>
+        <button type="submit">Sign Up</button>
+    </form>
+    <!-- Direct existing users to the login page. -->
+    <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+</main>
+
+ {% include 'partials/footer.html' %}
