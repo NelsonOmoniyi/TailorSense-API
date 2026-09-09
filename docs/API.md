@@ -11,6 +11,396 @@ TailorSense is a measurement-based style application. Users will enter their mea
 
 This document is designed to let a developer immediately test the API with **Postman**, connect it to a **web application**, or connect it to a **mobile application**.
 
+## Quick Start: Copy These Requests
+
+This section is the fastest way to use the API. Start the server, then follow
+the instructions for the client you are using. The URLs, headers, bodies,
+successful responses, and common errors are provided below without requiring
+additional project knowledge.
+
+```powershell
+python manage.py runserver
+python manage.py migrate
+```
+
+Use this base URL for local testing:
+
+```text
+http://127.0.0.1:8000
+```
+
+### A. Registration: `POST /api/users/register/`
+
+#### Postman: exact setup
+
+| Postman area | Value |
+|---|---|
+| Method | `POST` |
+| URL | `http://127.0.0.1:8000/api/users/register/` |
+| Authorization | `No Auth` |
+| Params | Leave empty |
+| Header | `Content-Type: application/json` |
+| Body | **raw** -> **JSON**, then paste the JSON below |
+
+```json
+{
+  "full_name": "Alex Taylor",
+  "email": "alex@example.com",
+  "phone": "+1 555 123 4567",
+  "password": "StrongPassword123!",
+  "password_confirmation": "StrongPassword123!"
+}
+```
+
+Click **Send**. Expected success:
+
+```text
+201 Created
+```
+
+```json
+{
+  "id": 1,
+  "email": "alex@example.com",
+  "first_name": "Alex Taylor",
+  "phone": "+1 555 123 4567"
+}
+```
+
+Example error when the email is already registered:
+
+```text
+400 Bad Request
+```
+
+```json
+{
+  "email": [
+    "An account with this email already exists."
+  ]
+}
+```
+
+#### Web application: exact JavaScript
+
+```javascript
+const response = await fetch('/api/users/register/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    full_name: 'Alex Taylor',
+    email: 'alex@example.com',
+    phone: '+1 555 123 4567',
+    password: 'StrongPassword123!',
+    password_confirmation: 'StrongPassword123!'
+  })
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+  console.error(data); // Validation error details
+} else {
+  console.log(data); // Created user
+}
+```
+
+No authorization, session cookie, API key, or JWT is required to register.
+
+#### Mobile application: exact request shape
+
+```javascript
+const response = await fetch('https://api.example.com/api/users/register/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    full_name: 'Alex Taylor',
+    email: 'alex@example.com',
+    phone: '+1 555 123 4567',
+    password: 'StrongPassword123!',
+    password_confirmation: 'StrongPassword123!'
+  })
+});
+
+const data = await response.json();
+```
+
+The mobile app receives the same success and error responses shown above.
+
+### B. Web Login: `POST /api/users/login/`
+
+Use this endpoint for the current web application. It creates a Django
+`sessionid` cookie.
+
+#### Postman: exact setup
+
+| Postman area | Value |
+|---|---|
+| Method | `POST` |
+| URL | `http://127.0.0.1:8000/api/users/login/` |
+| Authorization | `No Auth` |
+| Params | Leave empty |
+| Header | `Content-Type: application/json` |
+| Body | **raw** -> **JSON**, then paste the JSON below |
+
+```json
+{
+  "email": "alex@example.com",
+  "password": "StrongPassword123!"
+}
+```
+
+Click **Send**. Expected success:
+
+```text
+200 OK
+```
+
+```json
+{
+  "id": 1,
+  "email": "alex@example.com",
+  "first_name": "Alex Taylor",
+  "phone": "+1 555 123 4567"
+}
+```
+
+Postman should save a `sessionid` cookie. If the credentials are wrong:
+
+```text
+400 Bad Request
+```
+
+```json
+{
+  "detail": "Invalid email or password."
+}
+```
+
+#### Web application: exact JavaScript
+
+```javascript
+const response = await fetch('/api/users/login/', {
+  method: 'POST',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-CSRFToken': csrfToken
+  },
+  body: JSON.stringify({
+    email: 'alex@example.com',
+    password: 'StrongPassword123!'
+  })
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+  console.error(data); // Login error
+} else {
+  console.log(data); // Logged-in user
+}
+```
+
+`credentials: 'include'` allows the browser to save and send the `sessionid`
+cookie. `csrfToken` must be the CSRF token supplied by Django.
+
+#### Mobile application
+
+Do not use this session endpoint for the mobile app. Use the JWT endpoint below.
+
+### C. Mobile Login: `POST /api/token/`
+
+Use this endpoint for the mobile application. It returns JWT access and refresh
+tokens instead of a browser session.
+
+#### Postman: exact setup
+
+| Postman area | Value |
+|---|---|
+| Method | `POST` |
+| URL | `http://127.0.0.1:8000/api/token/` |
+| Authorization | `No Auth` |
+| Params | Leave empty |
+| Header | `Content-Type: application/json` |
+| Body | **raw** -> **JSON**, then paste the JSON below |
+
+```json
+{
+  "username": "alex@example.com",
+  "password": "StrongPassword123!"
+}
+```
+
+Expected success:
+
+```text
+200 OK
+```
+
+```json
+{
+  "access": "<access-token>",
+  "refresh": "<refresh-token>"
+}
+```
+
+Invalid credentials return `401 Unauthorized`.
+
+#### Web application
+
+The web application should normally use `/api/users/login/` and a session. If
+the web client uses JWT instead, it must store tokens securely and send the
+access token as a Bearer token. Do not put tokens in URLs.
+
+#### Mobile application: exact JavaScript request shape
+
+```javascript
+const tokenResponse = await fetch('https://api.example.com/api/token/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    username: 'alex@example.com',
+    password: 'StrongPassword123!'
+  })
+});
+
+const tokens = await tokenResponse.json();
+
+if (!tokenResponse.ok) {
+  console.error(tokens); // Login error
+} else {
+  // Store these in iOS Keychain, Android Keystore, or equivalent secure storage.
+  const accessToken = tokens.access;
+  const refreshToken = tokens.refresh;
+}
+```
+
+The field is named `username` because Simple JWT uses that field by default.
+In TailorSense, the username value is the user's email address.
+
+### D. Get Current User: `GET /api/users/me/`
+
+This endpoint is protected. It requires either a valid web session or a valid
+JWT access token.
+
+#### Postman using JWT: exact setup
+
+| Postman area | Value |
+|---|---|
+| Method | `GET` |
+| URL | `http://127.0.0.1:8000/api/users/me/` |
+| Params | Leave empty |
+| Body | Leave empty |
+| Authorization | **Bearer Token**, paste the `access` token from `/api/token/` |
+
+Postman will send:
+
+```http
+Authorization: Bearer <access-token>
+```
+
+Expected success:
+
+```text
+200 OK
+```
+
+```json
+{
+  "id": 1,
+  "email": "alex@example.com",
+  "first_name": "Alex Taylor",
+  "phone": "+1 555 123 4567"
+}
+```
+
+Without a session or token:
+
+```text
+401 Unauthorized
+```
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+#### Web application: exact JavaScript
+
+```javascript
+const response = await fetch('/api/users/me/', {
+  method: 'GET',
+  credentials: 'include'
+});
+
+const user = await response.json();
+
+if (!response.ok) {
+  console.error(user); // Authentication error
+} else {
+  console.log(user); // Current signed-in user
+}
+```
+
+The browser uses the `sessionid` cookie created by `/api/users/login/`.
+
+#### Mobile application: exact JavaScript
+
+```javascript
+const response = await fetch('https://api.example.com/api/users/me/', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${accessToken}`
+  }
+});
+
+const user = await response.json();
+```
+
+The mobile app must use the access token, not the refresh token, for this request.
+
+### D1. Refresh A Mobile Token: `POST /api/token/refresh/`
+
+When the mobile access token expires, call:
+
+| Postman area | Value |
+|---|---|
+| Method | `POST` |
+| URL | `http://127.0.0.1:8000/api/token/refresh/` |
+| Authorization | `No Auth` |
+| Params | Leave empty |
+| Header | `Content-Type: application/json` |
+| Body | **raw** -> **JSON** |
+
+```json
+{
+  "refresh": "<refresh-token>"
+}
+```
+
+Success response:
+
+```text
+200 OK
+```
+
+```json
+{
+  "access": "<new-access-token>"
+}
+```
+
+An invalid or expired refresh token returns `401 Unauthorized`. Replace the old
+access token with the new one before calling `/api/users/me/` again.
+
 ## Start The API
 
 From the project folder:
