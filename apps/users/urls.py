@@ -5,7 +5,7 @@ urlpatterns = [
     # Creates an account and its related UserProfile.
     path('register/', views.register, name='api-register'),
     # Starts a Django session after valid credentials are supplied.
-    path('login/', views.login, name='login'),
+    path('login/', views.login, name='api-login'),
     # Ends the current authenticated session.
     path('logout/', views.logout, name='api-logout'),
     # Returns the account associated with the current session.

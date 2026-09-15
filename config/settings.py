@@ -9,34 +9,23 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-import os
 from datetime import timedelta
 from pathlib import Path
-
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load developer-specific values from the ignored project-root .env file.
-# .env.example documents the required variable names without containing secrets.
-load_dotenv(BASE_DIR / '.env')
+# Development settings are kept in the project while production values are
+# supplied through the deployment environment.
+SECRET_KEY = 'Q-82P1AY5T3M4JNnv9sPD33YQ0igxTRSr_xuBmgUXok-LRG9VwxOgPiACb4B4caDqss'
+DEBUG = True
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-if not SECRET_KEY:
-    raise RuntimeError('DJANGO_SECRET_KEY must be set in the environment or .env file.')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
-
-ALLOWED_HOSTS = [host.strip() for host in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') if host.strip()]
-
-
 # Application definition
 
 INSTALLED_APPS = [

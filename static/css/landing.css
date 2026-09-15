@@ -79,6 +79,81 @@ a {
     gap: 18px;
 }
 
+.home-header {
+    position: relative;
+    transform: none;
+    left: auto;
+    margin: 0 auto;
+    color: var(--ink);
+}
+
+.profile-menu {
+    position: relative;
+}
+
+.profile-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 15px 8px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--white);
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+}
+
+.profile-button::-webkit-details-marker {
+    display: none;
+}
+
+.profile-avatar {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--white);
+    background: var(--plum);
+}
+
+.profile-panel {
+    position: absolute;
+    z-index: 40;
+    top: calc(100% + 10px);
+    right: 0;
+    display: grid;
+    min-width: 230px;
+    gap: 5px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.profile-panel span {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.profile-panel form {
+    margin-top: 12px;
+}
+
+.profile-panel button {
+    width: 100%;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 8px;
+    color: var(--white);
+    background: var(--plum);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
 .nav-link,
 .nav-cta {
     display: inline-flex;

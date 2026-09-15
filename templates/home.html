@@ -1,13 +1,27 @@
 {% include 'partials/head.html' %}
 
+<header class="site-header home-header">
+    <a href="{% url 'home' %}" class="brand" aria-label="TailorSense home">TailorSense</a>
+    <details class="profile-menu">
+        <summary class="profile-button" aria-label="Open profile menu">
+            <span class="profile-avatar" aria-hidden="true">{{ request.user.first_name|first|upper }}</span>
+            <span>Profile</span>
+        </summary>
+        <div class="profile-panel">
+            <strong>{{ request.user.first_name }}</strong>
+            <span>{{ request.user.email }}</span>
+            <form action="{% url 'signout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Sign Out</button>
+            </form>
+        </div>
+    </details>
+</header>
+
 <!-- Private home page shown after a successful login. -->
 <main>
     <h1>Welcome to TailorSense</h1>
     <p>You are signed in as {{ request.user.email|default:request.user.username }}.</p>
-    <form action="{% url 'signout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Sign Out</button>
-    </form>
 </main>
 
 {% include 'partials/footer.html' %}

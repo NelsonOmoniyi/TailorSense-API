@@ -11,7 +11,7 @@
         {% csrf_token %}
         <div>
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required autocomplete="email">
+            <input type="email" id="email" name="email" value="{{ request.POST.email|default:'' }}" required autocomplete="email">
         </div>
         <div>
             <label for="password">Password:</label>
