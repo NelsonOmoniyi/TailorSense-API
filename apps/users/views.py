@@ -1,14 +1,18 @@
 """HTTP handlers for the user API."""
 
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 from .services import authenticate_user, create_user
+
+
+def _email_matches_user(email, user):
+    return email and email.strip().lower() == user.email.lower()
 
 
 # Public endpoint that accepts registration JSON and returns the new user.
@@ -24,8 +28,7 @@ def register(request):
     return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
-# Public endpoint that verifies credentials and starts a Django session.
-# The client must preserve the returned session cookie for protected requests.
+# Public endpoint that verifies credentials and returns JWT credentials.
 @api_view(['POST'])
 def login(request):
     serializer = LoginSerializer(data=request.data)
@@ -40,25 +43,43 @@ def login(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Store the authenticated user's ID in the session for later requests.
-    auth_login(request, user)
-    return Response(UserSerializer(user).data)
+    refresh = RefreshToken.for_user(user)
+    return Response({
+        'user': UserSerializer(user).data,
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+    })
 
 
-# Protected endpoint that ends the current authenticated session.
+# Protected endpoint that revokes the refresh token.
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
-    # Remove authentication state and return 204 because no response body is needed.
-    auth_logout(request)
+    email = request.data.get('email')
+    refresh_token = request.data.get('refresh')
+    if not email or not refresh_token:
+        return Response({'detail': 'Email and refresh token are required.'}, status=400)
+    if not _email_matches_user(email, request.user):
+        return Response({'detail': 'Email does not match the authenticated user.'}, status=403)
+
+    try:
+        token = RefreshToken(refresh_token)
+        if str(token.get('user_id')) != str(request.user.pk):
+            raise TokenError('Refresh token does not belong to the authenticated user.')
+        token.blacklist()
+    except TokenError:
+        return Response({'detail': 'Invalid refresh token.'}, status=400)
+
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Protected endpoint used by the frontend to restore the current user on load.
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def me(request):
-    # SessionAuthentication and Django middleware populate request.user for us.
+def profile(request):
+    email = request.query_params.get('email')
+    if not _email_matches_user(email, request.user):
+        return Response({'detail': 'Email does not match the authenticated user.'}, status=403)
     return Response(UserSerializer(request.user).data)
 
 
