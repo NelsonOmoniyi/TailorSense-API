@@ -2,7 +2,7 @@
 
 TailorSense is a Django application for personalized tailoring and style recommendations. Users will be able to enter measurements and receive suggested styles and designs.
 
-The current API supports user registration, web session login, and JWT authentication for future mobile clients. The living API reference is [docs/API.md](docs/API.md).
+The API uses one JWT authentication flow for both web and mobile clients. The living API reference is [API User Guide/API.md](API%20User%20Guide/API.md).
 
 ## Technology Stack
 
@@ -29,7 +29,7 @@ TailorSense/
 │       ├── views.py
 │       └── tests/
 ├── config/                   # Django settings and root routes
-├── docs/API.md               # Living API reference
+├── API User Guide/API.md     # Living API reference
 ├── static/                   # CSS and images
 ├── templates/                # Server-rendered HTML
 ├── .env.example              # Safe environment-variable template
@@ -46,8 +46,8 @@ TailorSense/
 - `apps/users/views.py` — API request and response handling.
 - `apps/users/urls.py` — user API route definitions.
 - `config/settings.py` — environment, DRF, and JWT configuration.
-- `config/urls.py` — root routes, including user and token endpoints.
-- `docs/API.md` — endpoint contracts, examples, authentication, and planned API areas.
+- `config/urls.py` — root routes, including the user API.
+- `API User Guide/API.md` — endpoint contracts, examples, and JWT authentication.
 
 ## Installation
 

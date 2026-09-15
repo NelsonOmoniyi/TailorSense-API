@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Enables DRF serializers, API decorators, Response objects, and permissions.
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'apps.core',
     'apps.users',
 ]
@@ -126,10 +127,8 @@ LOGIN_REDIRECT_URL = '/home/'
 LOGOUT_REDIRECT_URL = '/'
 
 REST_FRAMEWORK = {
-    # Keep session authentication for the current web app and add JWT so a
-    # future mobile app can authenticate without depending on browser cookies.
+    # Both API clients use the same Bearer JWT authentication contract.
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     # Public access is the default; protected views opt into IsAuthenticated.
@@ -138,12 +137,12 @@ REST_FRAMEWORK = {
     ],
 }
 
-# JWT settings control the lifetime of the two tokens issued to mobile clients.
+# JWT settings control the lifetime of the tokens issued to every API client.
 # Access tokens are short-lived; refresh tokens allow the app to obtain a new
 # access token without asking the user to enter their password again.
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'BLACKLIST_AFTER_ROTATION': True,
 }

@@ -16,17 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Public landing page and authenticated home routes.
     path('', include('apps.core.urls')),
     path('api/users/', include('apps.users.urls')),
-    # Mobile clients exchange the account username (currently the email) and
-    # password for short-lived access and longer-lived refresh JWTs.
-    path('api/token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
-    # Mobile clients use the refresh token to obtain a new access token.
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
 ]
 
