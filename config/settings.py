@@ -146,3 +146,5 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+API_BASE_URL = 'http://127.0.0.1:8000/api/users/'

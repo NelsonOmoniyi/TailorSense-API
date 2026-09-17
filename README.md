@@ -32,7 +32,6 @@ TailorSense/
 ├── API User Guide/API.md     # Living API reference
 ├── static/                   # CSS and images
 ├── templates/                # Server-rendered HTML
-├── .env.example              # Safe environment-variable template
 ├── manage.py
 ├── requirements.txt
 └── README.md
@@ -73,24 +72,10 @@ pip install -r requirements.txt
 
 Secrets should not be placed inside the virtual environment. The virtual environment contains installed packages; the `.env` file contains local configuration and secrets.
 
-Each developer creates a private local `.env` file from the committed example:
+Each developer creates a private local `.env` file with a generated secret:
 
 ```powershell
-Copy-Item .env.example .env
-```
-
-Generate a unique local Django key:
-
-```powershell
-python -c "import secrets; print(secrets.token_urlsafe(50))"
-```
-
-Put the generated value in `.env`:
-
-```text
-DJANGO_SECRET_KEY=generated-value-here
-DJANGO_DEBUG=True
-DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+python -c "from pathlib import Path; import secrets; Path('.env').write_text(f'DJANGO_SECRET_KEY={secrets.token_urlsafe(50)}\nDJANGO_DEBUG=True\nDJANGO_ALLOWED_HOSTS=127.0.0.1,localhost\n', encoding='utf-8')"
 ```
 
 `.env` is ignored by Git. Team members do not need to share your local key. Each developer gets a separate local key, sessions, and JWT signing context. A deployed environment must use its own secret stored in the hosting provider's secret manager.
