@@ -1,2 +1,10 @@
 # Core framework
 Django==6.1
+
+# Environment and API support
+python-dotenv
+requests
+
+# REST API and auth
+djangorestframework
+djangorestframework-simplejwt
