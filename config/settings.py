@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'apps.core',
     'apps.users',
+    'apps.fabrics',
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

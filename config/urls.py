@@ -22,5 +22,6 @@ urlpatterns = [
     # Public landing page and authenticated home routes.
     path('', include('apps.core.urls')),
     path('api/users/', include('apps.users.urls')),
+    path('api/fabrics/', include('apps.fabrics.urls')),
 ]
 
