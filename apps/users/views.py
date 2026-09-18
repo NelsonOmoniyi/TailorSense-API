@@ -1,13 +1,16 @@
-"""Views for user-related API operations."""
+"""Views for the web-based user registration and login flow."""
 
-from django.contrib.auth import authenticate, get_user_model, login as auth_login
-from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, get_user_model
+from django.shortcuts import redirect, render
+
+from .auth import login_user
 
 
 User = get_user_model()
 
-# Render the account creation page.
+
 def register(request):
+    """Render the sign-up page and create a new user when the form is submitted."""
     error = None
 
     if request.method == 'POST':
@@ -24,6 +27,7 @@ def register(request):
         elif User.objects.filter(username=email).exists():
             error = 'An account with this email already exists.'
         else:
+            # Create the standard Django user and let the view redirect to login.
             User.objects.create_user(
                 username=email,
                 email=email,
@@ -35,8 +39,8 @@ def register(request):
     return render(request, 'register.html', {'error': error})
 
 
-# Render the login page with its email and password fields.
 def login(request):
+    """Authenticate the user and send them to the signed-in dashboard on success."""
     error = None
 
     if request.method == 'POST':
@@ -45,7 +49,7 @@ def login(request):
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
-            auth_login(request, user)
+            login_user(request, user)
             return redirect('home')
 
         error = 'Invalid email or password.'

@@ -25,5 +25,9 @@ urlpatterns = [
     # Public account pages for registration and login.
     path('register/', user_views.register, name='register'),
     path('login/', user_views.login, name='login'),
+    # Fabric catalog API for signed-in users.
+    path('api/fabrics/', include('apps.fabrics.api_urls')),
+    # Dedicated server-rendered fabric dashboard for the signed-in user.
+    path('fabrics/', include('apps.fabrics.urls')),
 ]
 

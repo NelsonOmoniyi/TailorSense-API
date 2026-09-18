@@ -1,322 +1,186 @@
-# Django Starter Template
+# TailorSense
 
-A clean, reusable Django starter project intended to serve as a foundation for new Django web applications.
+TailorSense is a Django application for personalized tailoring and fabric selection. The project combines a public landing page, a signed-in user flow, and an authenticated fabric inventory API that feeds the UI for logged-in users.
 
-This repository contains the basic Django project structure, a starter application, URL routing, Django's built-in administration/authentication/session framework, SQLite development database configuration, and the standard WSGI/ASGI entry points.
+## Project goals
 
-> **Template status:** This is a minimal starter foundation. Application-specific business logic, models, authentication customisation, APIs, and production infrastructure can be added as a project grows.
+- Keep the web app and API aligned with the same authenticated user model.
+- Protect sensitive fabric inventory data behind authenticated routes.
+- Let the core app fetch fabric data from the API and present it in the signed-in dashboard.
+- Keep the codebase readable for other developers by using clear comments and app-level documentation.
 
-## Features
-
-- Django 6.1
-- Standard Django project structure
-- Starter application (`apps/core`)
-- User application (`apps/users`)
-- Django Admin
-- Django authentication and session framework
-- SQLite database for local development
-- URL routing with application-level `urls.py`
-- WSGI and ASGI entry points
-- Django static-file configuration
-- Basic password validation
-- Django test framework scaffold
-
-## Technology Stack
+## Technology stack
 
 | Technology | Version / Usage |
 |---|---|
 | Python | 3.12+ |
-| Django | 6.1 |
-| Database | SQLite (development default) |
-| Web interfaces | WSGI / ASGI |
-| Version control | Git / GitHub |
+| Django | 5.2.6 |
+| Django REST Framework | 3.16.1 |
+| Simple JWT | 5.5.1 |
+| python-dotenv | 1.1.1 |
+| requests | 2.32.3 |
+| Database | SQLite for development |
 
-## Project Structure
+## Project structure
 
 ```text
-Starter/
+TailorSense/
 ├── apps/
-│   ├── __init__.py
-│   ├── api/
-│   ├── users/
-│   │   ├── __init__.py
-│   │   ├── apps.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── urls.py
-│   │   ├── views.py
-│   │   └── tests/
-│   └── core/
-│       ├── __init__.py
-│       ├── admin.py
-│       ├── apps.py
-│       ├── models.py
-│       ├── tests.py
-│       ├── urls.py
-│       └── views.py
-│
-├── config/
-│   ├── __init__.py
-│   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
-├── templates/
-│
-├── manage.py
-├── requirements.txt
-└── README.md
+│   ├── core/                 # Public pages and signed-in dashboard shell
+│   ├── fabrics/              # Fabric model, API, dashboard and routes
+│   └── users/                # Web auth and account handling
+├── config/                   # Django settings and project routing
+├── templates/                # Shared and app-specific HTML templates
+├── static/                   # Shared CSS and static assets
+├── .env.example              # Local environment template
+├── README.md                 # Project overview and developer setup
+├── requirements.txt          # Python dependencies
+├── manage.py                 # Django entry point
+├── db.sqlite3                # Local SQLite database
+├── LICENSE                   # Project license
+├── TailorSense_API_Structure_Reference_Guide.docx
+└── API User Guide/
+    └── API.md                # API reference for the TailorSense app
 ```
 
-### `config/`
+## The apps and what they do
 
-The main Django project configuration.
+- `apps/core` — contains the public landing page and the authenticated home page shell.
+- `apps/users` — handles the sign-up and login flow used by the web application.
+- `apps/fabrics` — stores fabric inventory data, provides the fabric API, and renders the dashboard UI.
+- `config` — central Django settings and root URL configuration.
+- `templates` — reusable Bootstrap layout and page templates.
 
-- `settings.py` — project settings and installed applications.
-- `urls.py` — root URL configuration.
-- `asgi.py` — ASGI entry point.
-- `wsgi.py` — WSGI entry point.
+## Authentication pattern
 
-### `apps/core/`
+The current project follows a realistic layered approach:
 
-The initial reusable Django application.
+- Public routes remain open for user registration and sign-in.
+- The web app uses Django session authentication for signed-in pages.
+- The fabric API is protected and expects authenticated users.
+- The core app calls the API using the current session cookies and then passes the returned data into the page context.
+- JWT support is still available for API-based clients, but the current fabric feature is designed for the already-signed-in user experience.
 
-- `views.py` — application views.
-- `urls.py` — application URL routes.
-- `models.py` — database models.
-- `admin.py` — Django Admin registrations.
-- `tests.py` — application tests.
-- `apps.py` — Django application configuration.
+## Current API surface
 
-### `apps/api/`
+The project currently contains one implemented JSON API endpoint and several web routes.
 
-Reserved for API-specific endpoints and application logic.
+### Implemented API
 
-### `apps/users/`
+- `GET /api/fabrics/list/` — returns the list of available fabrics for the authenticated user session.
 
-Responsible for user and account-related API concerns.
+### Web-only routes
 
-- `models.py` — user-domain data models.
-- `serializers.py` — user data representations and request validation.
-- `views.py` — user-related API request handling.
-- `urls.py` — user API route definitions.
-- `tests/` — user API and data behavior tests.
+- `/login/` — server-rendered login page
+- `/register/` — server-rendered signup page
+- `/home/` — signed-in dashboard shell
+- `/fabrics/` — server-rendered fabric dashboard page
 
-### `templates/`
+### Planned future APIs
 
-Reserved for project-level HTML templates.
+The project may later add dedicated JSON APIs for user auth and profile work, but those are not part of the current live implementation in this branch.
 
-For example:
+For the live API contract, always refer to [API User Guide/API.md](API%20User%20Guide/API.md). If a route is not documented there, it should be treated as a web route or an unimplemented feature rather than a current API endpoint.
 
-```text
-templates/
-├── base.html
-├── home.html
-└── ...
+## Local setup
+
+### 1. Create a virtual environment
+
+Windows:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-The current template folder is intentionally empty.
-
-## Requirements
-
-- Python 3.12 or newer
-- `pip`
-- Git
-- A virtual environment (recommended)
-
-Django 6.1 is currently pinned in `requirements.txt`.
-
-## Installation
-
-### 1. Clone the repository
+macOS/Linux:
 
 ```bash
-git clone https://github.com/<your-username>/<your-repository>.git
-cd <your-repository>
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### 2. Create a virtual environment
-
-#### Windows
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-#### macOS / Linux
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Upgrade pip
-
-```bash
-python -m pip install --upgrade pip
-```
-
-### 4. Install dependencies
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Running the Project
+### 3. Create the local environment file
 
-Before starting the server, apply the initial migrations:
+```powershell
+Copy-Item .env.example .env
+```
+
+Then update the values in `.env`:
+
+```env
+DJANGO_SECRET_KEY=replace-with-a-unique-local-secret-key
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+```
+
+### 4. Run migrations and the app
 
 ```bash
 python manage.py migrate
-```
-
-Start the development server:
-
-```bash
 python manage.py runserver
 ```
 
-Open:
-
-```text
-http://127.0.0.1:8000/
-```
-
-The starter application's current home route is:
-
-```text
-http://127.0.0.1:8000/app/
-```
-
-Django Admin is available at:
-
-```text
-http://127.0.0.1:8000/admin/
-```
-
-## Creating an Administrator
-
-Create a Django superuser with:
-
-```bash
-python manage.py createsuperuser
-```
-
-Follow the prompts, then sign in through the Admin URL.
-
-## URL Configuration
-
-The root project currently exposes two routes:
+## Main routes
 
 | Route | Purpose |
 |---|---|
+| `/` | Public landing page |
+| `/login/` | Web login page |
+| `/register/` | Web registration page |
+| `/home/` | Signed-in home page |
+| `/fabrics/` | Authenticated fabric dashboard |
+| `/api/fabrics/list/` | Protected fabric inventory API |
 | `/admin/` | Django administration |
-| `/app/` | Starter application |
 
-The `/app/` route is connected through `config/urls.py`:
+## Fabric API contract
 
-```python
-path('app/', include('apps.core.urls'))
+The fabric inventory API is intentionally protected because it is meant for signed-in users only.
+
+Example request:
+
+```http
+GET /api/fabrics/list/
+Cookie: sessionid=...
 ```
 
-The starter application's home view currently returns a simple HTTP response.
+Example response:
 
-As the project develops, application routes should remain inside the relevant app's `urls.py` and be included from the root URL configuration.
-
-## Database
-
-The starter uses SQLite by default:
-
-```text
-db.sqlite3
+```json
+[
+  {
+    "id": 1,
+    "name": "Cotton Twill",
+    "category": "Cotton",
+    "composition": "100% Cotton",
+    "color": "Navy",
+    "weight_gsm": 220,
+    "price_per_meter": "12.50",
+    "stock_units": 25,
+    "supplier": "Local Mill",
+    "created_at": "2026-09-18T12:00:00Z",
+    "updated_at": "2026-09-18T12:00:00Z"
+  }
+]
 ```
 
-SQLite is convenient for development and prototyping. For production applications, consider using a production database such as PostgreSQL.
+## Comments and maintainability
 
-After changing models:
+This project keeps comments in the most important app and code blocks so future developers can understand the intent of the architecture without digging through the full project history. Each major feature area now includes docstrings or inline comments explaining what it does and why it exists.
 
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
+## Notes
 
-## Static Files
+- Keep `.env` local and private.
+- Do not commit real secrets or production values.
+- The current fabric feature is designed for the already-authenticated user flow.
+- Bootstrap is used in the shared templates to keep the UI consistent across pages.
 
-Django's static-file system is enabled with:
-
-```python
-STATIC_URL = 'static/'
-```
-
-As the project grows, static assets can be organised into a dedicated `static/` directory and configured further for deployment.
-
-## Testing
-
-Run Django's test suite with:
-
-```bash
-python manage.py test
-```
-
-Add application-specific tests to:
-
-```text
-apps/core/tests.py
-```
-
-For larger projects, tests can later be split into a dedicated test package.
-
-## Creating Additional Applications
-
-Create a new application with:
-
-```bash
-python manage.py startapp <app_name>
-```
-
-For a larger project, a common structure is:
-
-```text
-apps/
-├── accounts/
-├── dashboard/
-├── payments/
-└── ...
-```
-
-After creating an app, add it to `INSTALLED_APPS` in `config/settings.py` and include its URL configuration where appropriate.
-
-## Recommended Development Workflow
-
-1. Create a new repository from this starter.
-2. Rename `apps/core` to a meaningful application name if appropriate.
-3. Update the project configuration and application names.
-4. Create your models.
-5. Create and apply migrations.
-6. Add views and URL routes.
-7. Add templates and static assets.
-8. Add tests.
-9. Configure environment-specific settings.
-10. Review security settings before deployment.
-
-## Environment & Secrets
-
-The current starter stores `SECRET_KEY` directly in `config/settings.py`. **Do not reuse the current secret key for a real application.**
-
-Before publishing this repository or using it for a real project:
-
-- Generate a new secret key.
-- Move secrets and environment-specific configuration into environment variables.
-- Set `DEBUG = False` in production.
-- Configure `ALLOWED_HOSTS`.
-- Configure CSRF trusted origins where necessary.
-- Never commit passwords, API keys, tokens, database credentials, or `.env` files.
-
-A future improvement for this template is to introduce environment-based settings using a `.env` file and a package such as `django-environ` or `python-decouple`.
-
-## Production Checklist
 
 Before deploying a project created from this template:
 
