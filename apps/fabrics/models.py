@@ -12,29 +12,20 @@ class Fabric(models.Model):
         MEDIUM = 'medium', 'Medium'
         HIGH = 'high', 'High'
 
-    name = models.CharField(max_length=150)
-    category = models.CharField(max_length=100, blank=True)
+    fabric_name = models.CharField(max_length=150)
+    fiber_category = models.CharField(max_length=100, blank=True)
+    fiber = models.CharField(max_length=50, blank=True)
+    fabric_type = models.CharField(max_length=100, blank=True)
     composition = models.CharField(max_length=200, blank=True)
     construction = models.CharField(max_length=100, blank=True)
-    weight_gsm = models.PositiveIntegerField(null=True, blank=True)
+    weight = models.PositiveIntegerField(blank=True)
     stretch = models.CharField(
         max_length=20,
         choices=PropertyLevel.choices,
         default=PropertyLevel.NONE,
         blank=True,
     )
-    drape = models.CharField(
-        max_length=20,
-        choices=PropertyLevel.choices,
-        default=PropertyLevel.NONE,
-        blank=True,
-    )
-    structure = models.CharField(
-        max_length=20,
-        choices=PropertyLevel.choices,
-        default=PropertyLevel.NONE,
-        blank=True,
-    )
+    structure = models.CharField(max_length=20, blank=True,)
     breathability = models.CharField(
         max_length=20,
         choices=PropertyLevel.choices,
@@ -51,7 +42,10 @@ class Fabric(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['fabric_name']
 
     def __str__(self):
         return self.name
+
+
+

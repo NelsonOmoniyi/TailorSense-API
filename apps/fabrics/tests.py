@@ -8,16 +8,19 @@ class FabricRecommendationModelTests(TestCase):
         field_names = {field.name for field in Fabric._meta.get_fields()}
 
         required_fields = {
-            'name',
-            'category',
+            'fabric_name',
+            'fiber_category',
+            'fiber',
+            'fabric_type',
             'composition',
-            'weight_gsm',
             'construction',
+            'weight',
             'stretch',
-            'drape',
             'structure',
             'breathability',
             'opacity',
+            'created_at',
+            'updated_at',
         }
 
         self.assertTrue(required_fields.issubset(field_names))

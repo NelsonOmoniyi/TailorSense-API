@@ -12,13 +12,14 @@ class FabricSerializer(serializers.ModelSerializer):
         model = Fabric
         fields = [
             'id',
-            'name',
-            'category',
+            'fabric_name',
+            'fiber_category',
+            'fiber',
+            'fabric_type',
             'composition',
             'construction',
-            'weight_gsm',
+            'weight',
             'stretch',
-            'drape',
             'structure',
             'breathability',
             'opacity',

@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -15,13 +14,14 @@ class Migration(migrations.Migration):
             name='Fabric',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
-                ('category', models.CharField(blank=True, max_length=100)),
-                ('composition', models.CharField(blank=True, max_length=200)),
-                ('construction', models.CharField(blank=True, max_length=100)),
-                ('weight_gsm', models.PositiveIntegerField(blank=True, null=True)),
+                ('fabric_name', models.CharField(max_length=150)),
+                ('fiber_category', models.CharField(max_length=150)),
+                ('fiber', models.CharField(max_length=150)),
+                ('fabric_type', models.CharField(max_length=150)),
+                ('composition', models.CharField(max_length=150)),
+                ('construction', models.CharField(max_length=150)),
+                ('weight', models.CharField(max_length=150)),
                 ('stretch', models.CharField(blank=True, choices=[('none', 'None'), ('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='none', max_length=20)),
-                ('drape', models.CharField(blank=True, choices=[('none', 'None'), ('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='none', max_length=20)),
                 ('structure', models.CharField(blank=True, choices=[('none', 'None'), ('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='none', max_length=20)),
                 ('breathability', models.CharField(blank=True, choices=[('none', 'None'), ('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='none', max_length=20)),
                 ('opacity', models.CharField(blank=True, choices=[('none', 'None'), ('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='none', max_length=20)),
