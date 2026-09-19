@@ -18,7 +18,7 @@ class Fabric(models.Model):
     fabric_type = models.CharField(max_length=100, blank=True)
     composition = models.CharField(max_length=200, blank=True)
     construction = models.CharField(max_length=100, blank=True)
-    weight = models.PositiveIntegerField(blank=True)
+    weight = models.CharField(max_length=100, blank=True)
     stretch = models.CharField(
         max_length=20,
         choices=PropertyLevel.choices,

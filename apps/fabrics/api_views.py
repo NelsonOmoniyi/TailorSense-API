@@ -19,7 +19,7 @@ def fabric_list(request):
     if user is None:
         return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    fabrics = Fabric.objects.order_by('name')
+    fabrics = Fabric.objects.order_by('fabric_name')
     serializer = FabricSerializer(fabrics, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
