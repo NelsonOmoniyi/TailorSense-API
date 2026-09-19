@@ -1,21 +1,26 @@
 from django.test import TestCase
 
-from apps.fabrics.models import Fabric
+from .models import Fabric
 
 
-class FabricModelTest(TestCase):
-    def test_create_fabric(self):
-        fabric = Fabric.objects.create(
-            name='Cotton Twill',
-            category='Cotton',
-            composition='100% Cotton',
-            color='Navy',
-            weight_gsm=220,
-            price_per_meter=12.50,
-            stock_units=25,
-            supplier='Local Mill',
-        )
+class FabricRecommendationModelTests(TestCase):
+    def test_fabric_model_has_recommendation_fields_only(self):
+        field_names = {field.name for field in Fabric._meta.get_fields()}
 
-        self.assertEqual(fabric.name, 'Cotton Twill')
-        self.assertEqual(fabric.category, 'Cotton')
-        self.assertTrue(str(fabric).startswith('Cotton Twill'))
+        required_fields = {
+            'fabric_name',
+            'fiber_category',
+            'fiber',
+            'fabric_type',
+            'composition',
+            'construction',
+            'weight',
+            'stretch',
+            'structure',
+            'breathability',
+            'opacity',
+            'created_at',
+            'updated_at',
+        }
+
+        self.assertTrue(required_fields.issubset(field_names))

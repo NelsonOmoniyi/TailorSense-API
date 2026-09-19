@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """HTTP handlers for the user API."""
 
 from rest_framework import status
@@ -9,12 +10,21 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 from .services import authenticate_user, create_user
+=======
+"""Views for the web-based user registration and login flow."""
+
+from django.contrib.auth import authenticate, get_user_model
+from django.shortcuts import redirect, render
+
+from .auth import login_user
+>>>>>>> fabrics
 
 
 def _email_matches_user(email, user):
     return email and email.strip().lower() == user.email.lower()
 
 
+<<<<<<< HEAD
 # Public endpoint that accepts registration JSON and returns the new user.
 # @api_view also rejects HTTP methods other than POST before this function runs.
 @api_view(['POST'])
@@ -35,6 +45,41 @@ def login(request):
     serializer.is_valid(raise_exception=True)
     # Delegate credential lookup to the service layer.
     user = authenticate_user(request=request, **serializer.validated_data)
+=======
+def register(request):
+    """Render the sign-up page and create a new user when the form is submitted."""
+    error = None
+
+    if request.method == 'POST':
+        fullname = request.POST.get('fullname', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        password = request.POST.get('password', '')
+        repeat_password = request.POST.get('repeat_password', '')
+
+        if not all((fullname, email, phone, password, repeat_password)):
+            error = 'All fields are required.'
+        elif password != repeat_password:
+            error = 'Passwords do not match.'
+        elif User.objects.filter(username=email).exists():
+            error = 'An account with this email already exists.'
+        else:
+            # Create the standard Django user and let the view redirect to login.
+            User.objects.create_user(
+                username=email,
+                email=email,
+                first_name=fullname,
+                password=password,
+            )
+            return redirect('login')  # Redirect to the login page after successful registration
+
+    return render(request, 'register.html', {'error': error})
+
+
+def login(request):
+    """Authenticate the user and send them to the signed-in dashboard on success."""
+    error = None
+>>>>>>> fabrics
 
     if user is None:
         # One generic error avoids revealing whether an email has an account.
@@ -43,12 +88,18 @@ def login(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+<<<<<<< HEAD
     refresh = RefreshToken.for_user(user)
     return Response({
         'user': UserSerializer(user).data,
         'access': str(refresh.access_token),
         'refresh': str(refresh),
     })
+=======
+        if user is not None:
+            login_user(request, user)
+            return redirect('home')
+>>>>>>> fabrics
 
 
 # Protected endpoint that revokes the mobile refresh token and signs out.

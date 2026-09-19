@@ -1,11 +1,7 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-from .views import FabricViewSet
-
-router = DefaultRouter()
-router.register(r'', FabricViewSet, basename='fabric')
+from . import views
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', views.dashboard, name='fabrics-dashboard'),
 ]

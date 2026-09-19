@@ -2,177 +2,118 @@
 
 **Base URL:** `http://127.0.0.1:8000`
 
-The API uses one JWT authentication flow for web and mobile clients. Registration
-and login are public. Protected endpoints use an access token in the
-`Authorization` header. No API key or Django session cookie is required by the
-API.
+This guide documents the interfaces that are actually implemented in the current project. It is intentionally aligned with the codebase, not with an earlier conceptual design.
 
-## Setup
+## Current project reality
 
-```powershell
-python manage.py migrate
-python manage.py runserver
-```
+The current TailorSense app uses a mixed architecture:
 
-Always include the trailing slash in API URLs.
+- Public user access is handled by server-rendered Django pages for register and login.
+- Signed-in user pages use Django session authentication.
+- The only JSON API currently implemented in this project is the authenticated fabric inventory API.
+- The core app fetches that API using the active user session and then passes the data to the web interface.
 
-## Endpoints
+This means the project is not yet a full JWT-first JSON API service for every user action. The user account flow is still web-based for now, and the fabric feature is the first authenticated API exposed to the app.
 
-| Method | Endpoint | Authentication | Purpose |
+## Authentication model
+
+### Web app authentication
+
+- Anonymous users can access `/` and `/login/` and `/register/`.
+- After login, the app sets a Django session cookie.
+- Protected pages such as `/home/` and `/fabrics/` rely on the user session.
+
+### API authentication
+
+- Browser-based API requests use the active session cookie.
+- The API expects an authenticated Django user session, not a separate API key.
+- For the current implementation, session authentication is the supported pattern for the fabric API.
+
+## Implemented endpoints
+
+### 1. Public web pages
+
+| Method | Endpoint | Auth | Purpose |
 |---|---|---|---|
-| `POST` | `/api/users/register/` | None | Create an account |
-| `POST` | `/api/users/login/` | None | Issue access and refresh JWTs |
-| `POST` | `/api/users/refresh/` | None | Issue a new access JWT |
-| `GET` | `/api/users/profile/?email=...` | Bearer access JWT | Get the authenticated user |
-| `POST` | `/api/users/logout/` | Bearer access JWT | Revoke the refresh JWT |
+| `GET` | `/` | None | Public landing page |
+| `GET` / `POST` | `/login/` | None | Login page and authentication |
+| `GET` / `POST` | `/register/` | None | Registration page and user creation |
 
-## 1. Register
+### 2. Signed-in web pages
 
-```http
-POST /api/users/register/
-Content-Type: application/json
-```
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/home/` | Session user | Signed-in dashboard shell |
+| `POST` | `/signout/` | Session user | Logout action |
+| `GET` | `/fabrics/` | Session user | Fabric dashboard page |
 
-```json
-{
-  "full_name": "Alex Taylor",
-  "email": "alex@example.com",
-  "phone": "+1 555 123 4567",
-  "password": "StrongPassword123!",
-  "password_confirmation": "StrongPassword123!"
-}
-```
+### 3. Fabric API
 
-Registration does not require an access token, API key, or session cookie.
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/api/fabrics/list/` | Session-authenticated user | Return all fabrics available in the system |
 
-Successful response: `201 Created`
+## How the fabric API is used
 
-```json
-{
-  "id": 1,
-  "email": "alex@example.com",
-  "first_name": "Alex Taylor",
-  "phone": "+1 555 123 4567"
-}
-```
+The signed-in dashboard flow is:
 
-## 2. Login
+1. A user logs in through Django's web login.
+2. The browser keeps the session cookie.
+3. The core app calls `/api/fabrics/list/` with that session attached.
+4. The API returns the fabric list as JSON.
+5. The view passes that data to the template.
+6. The template renders the inventory in Bootstrap cards.
+
+This keeps the UI and the data flow aligned with the current app architecture.
+
+## Example request: fabric list
 
 ```http
-POST /api/users/login/
-Content-Type: application/json
+GET /api/fabrics/list/
+Cookie: sessionid=your-session-cookie
 ```
 
-```json
-{
-  "email": "alex@example.com",
-  "password": "StrongPassword123!"
-}
-```
-
-Login is public. The password is used only for this request and is never sent
-with later API calls.
-
-Successful response: `200 OK`
+### Example response
 
 ```json
-{
-  "user": {
+[
+  {
     "id": 1,
-    "email": "alex@example.com",
-    "first_name": "Alex Taylor",
-    "phone": "+1 555 123 4567"
-  },
-  "access": "<access-token>",
-  "refresh": "<refresh-token>"
-}
+    "name": "Cotton Twill",
+    "category": "Cotton",
+    "composition": "100% Cotton",
+    "color": "Navy",
+    "weight_gsm": 220,
+    "price_per_meter": "12.50",
+    "stock_units": 25,
+    "supplier": "Local Mill",
+    "created_at": "2026-09-18T12:00:00Z",
+    "updated_at": "2026-09-18T12:00:00Z"
+  }
+]
 ```
 
-Store both tokens securely. Send the access token with protected requests:
+## Expected response behavior
 
-```http
-Authorization: Bearer <access-token>
-```
+- `200 OK` when the user is authenticated and fabric records are found.
+- Empty array `[]` when the user is authenticated but no fabrics exist yet.
+- An authentication failure when the session is not valid.
 
-The access token lasts 15 minutes. The refresh token lasts 7 days.
+## Future API expansion
 
-## 3. Refresh
+The project may grow to include more JSON endpoints later, such as:
 
-```http
-POST /api/users/refresh/
-Content-Type: application/json
-```
+- user registration API
+- user login API
+- user profile API
+- JWT token endpoints
+- additional inventory and tailoring APIs
 
-```json
-{
-  "refresh": "<refresh-token>"
-}
-```
+These are not currently implemented in this branch. This guide intentionally documents the live implementation rather than hypothetical features.
 
-Successful response:
+## Important guidance for developers
 
-```json
-{
-  "access": "<new-access-token>",
-  "refresh": "<new-refresh-token>"
-}
-```
-
-Replace the stored tokens when refresh-token rotation returns new values.
-
-## 4. Profile
-
-The email is supplied as a consistency check. The JWT remains the actual
-authentication credential and identifies the user.
-
-```http
-GET /api/users/profile/?email=alex@example.com
-Authorization: Bearer <access-token>
-```
-
-Successful response: `200 OK`
-
-```json
-{
-  "id": 1,
-  "email": "alex@example.com",
-  "first_name": "Alex Taylor",
-  "phone": "+1 555 123 4567"
-}
-```
-
-The endpoint returns `403 Forbidden` if the query email does not match the
-user identified by the access token.
-
-## 5. Logout
-
-Logout requires the access token and the refresh token. The access token
-authenticates the request; the refresh token is revoked so it cannot be used
-to create another access token.
-
-```http
-POST /api/users/logout/
-Authorization: Bearer <access-token>
-Content-Type: application/json
-```
-
-```json
-{
-  "email": "alex@example.com",
-  "refresh": "<refresh-token>"
-}
-```
-
-Successful response: `204 No Content`.
-
-The API verifies that the email and refresh token belong to the user identified
-by the access token. The client should also remove its locally stored tokens.
-
-## Security Rules
-
-- Registration and login do not require authentication.
-- Never send a password after login.
-- Never put JWTs in URLs, logs, or source control.
-- Store tokens in secure browser or mobile storage.
-- Use HTTPS outside local development.
-- A JWT is the API credential; there is no separate API-key mechanism.
+- Do not treat unimplemented routes as if they exist in production code.
+- Keep this guide updated whenever new endpoints are added or old ones change.
+- When a feature is intentionally web-only, it should be clearly labelled as such.
+- Use session authentication for browser-driven app flows and reserve JWT-based APIs for true API clients when needed later.

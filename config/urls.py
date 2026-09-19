@@ -16,12 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from apps.users import views as user_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Public landing page and authenticated home routes.
     path('', include('apps.core.urls')),
-    path('api/users/', include('apps.users.urls')),
-    path('api/fabrics/', include('apps.fabrics.urls')),
+    # Public account pages for registration and login.
+    path('register/', user_views.register, name='register'),
+    path('login/', user_views.login, name='login'),
+    # Fabric catalog API for signed-in users.
+    path('api/fabrics/', include('apps.fabrics.api_urls')),
+    # Dedicated server-rendered fabric dashboard for the signed-in user.
+    path('fabrics/', include('apps.fabrics.urls')),
 ]
 

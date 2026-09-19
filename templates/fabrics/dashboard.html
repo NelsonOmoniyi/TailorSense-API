@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Fabrics Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-uppercase text-muted fw-semibold mb-1">TailorSense</p>
+            <h1 class="mb-0">Fabrics Dashboard</h1>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-outline-dark">Back to Home</a>
+    </div>
+
+    {% if fabrics %}
+        <div class="row g-4">
+            {% for fabric in fabrics %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ fabric.fiber_category|default:'Fabric' }}</span>
+                                <!-- <span class="fw-bold text-success">${{ fabric.price_per_meter }}</span> -->
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-2">{{ fabric.fabric_name }}</h5>
+                            <p class="text-muted mb-3">{{ fabric.composition|default:'Composition not specified' }}</p>
+
+                            <ul class="list-group list-group-flush mb-3">
+                                <li class="list-group-item px-0">
+                                    <strong>Fabric Type:</strong> {{ fabric.fabric_type|default:'Not specified' }}
+                                </li>
+                                <li class="list-group-item px-0">
+                                    <strong>Weight:</strong> {{ fabric.weight }}
+                                </li>
+                                <li class="list-group-item px-0">
+                                    <strong>Construction:</strong> {{ fabric.construction }}
+                                </li>
+                                <li class="list-group-item px-0">
+                                    <strong>Structure:</strong> {{ fabric.structure|default:'Not listed' }}
+                                </li>
+                            </ul>
+
+                            <!-- <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Available</small>
+                                <button class="btn btn-primary btn-sm">View Details</button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            No fabrics are available in the catalog yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
