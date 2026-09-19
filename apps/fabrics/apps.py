@@ -1,5 +1,3 @@
-"""Application configuration for the fabrics inventory feature."""
-
 from django.apps import AppConfig
 
 
