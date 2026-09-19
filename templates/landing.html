@@ -3,16 +3,16 @@
 
 <body>
    
-<header class="site-header">
+<header class="site-header container-fluid d-flex flex-wrap align-items-center justify-content-between gap-3 px-3 px-md-4 px-lg-5">
     <a href="/" class="brand" aria-label="TailorSense home">
         <img
             src="{% static 'images/tailorsense-logo.png' %}"
             alt="TailorSense"
-            class="brand-logo"
+            class="brand-logo img-fluid"
         >
     </a>
 
-    <nav class="header-actions" aria-label="Main navigation">
+    <nav class="header-actions d-flex flex-wrap justify-content-end gap-1 gap-md-3 ms-auto" aria-label="Main navigation">
         <a href="/about-us/" class="nav-link">About Us</a>
         <a href="{% url 'login' %}" class="nav-link">Login</a>
         <a href="{% url 'register' %}" class="nav-cta">Sign Up</a>
@@ -28,7 +28,7 @@
 
             <div class="hero-curve" aria-hidden="true"></div>
 
-            <div class="hero-content">
+            <div class="hero-content container">
                 <p class="eyebrow">
                     TAILOR MADE FOR YOU
                     <span class="eyebrow-line" aria-hidden="true"></span>
@@ -43,7 +43,7 @@
                     TailorSense brings smart fashion personalization into one beautiful hub — helping you turn measurements, fabrics and ideas into fashion that feels made for you.
                 </p>
 
-                <div class="hero-actions">
+                <div class="hero-actions d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-3">
                     <a href="{% url 'register' %}" class="primary-btn">
                         Create Your Style
                         <span aria-hidden="true">→</span>
@@ -59,7 +59,7 @@
 
         <!-- ==================== BODY ==================== -->
         <section class="body-section" aria-labelledby="body-title">
-            <div class="section-heading">
+            <div class="section-heading container">
                 <p class="eyebrow">ONE HUB. MANY POSSIBILITIES.</p>
                 <h2 id="body-title">
                     Designed for the way <span>fashion works.</span>
@@ -70,8 +70,8 @@
                 </p>
             </div>
 
-            <div class="feature-grid">
-                <article class="feature-card">
+            <div class="feature-grid container row g-3">
+                <article class="feature-card col-12 col-lg-4">
                     <div class="feature-number">01</div>
                     <div class="feature-icon">⌁</div>
                     <h3>Personalized Fit</h3>
@@ -81,7 +81,7 @@
                     </p>
                 </article>
 
-                <article class="feature-card feature-card-highlight">
+                <article class="feature-card feature-card-highlight col-12 col-lg-4">
                     <div class="feature-number">02</div>
                     <div class="feature-icon">◇</div>
                     <h3>Style &amp; Fabric</h3>
@@ -91,7 +91,7 @@
                     </p>
                 </article>
 
-                <article class="feature-card">
+                <article class="feature-card col-12 col-lg-4">
                     <div class="feature-number">03</div>
                     <div class="feature-icon">✂</div>
                     <h3>Tailoring Hub</h3>

@@ -1,6 +1,10 @@
 # Core framework
-# Django 5.2 LTS is compatible with the current DRF and Simple JWT versions.
-Django==5.2.6
-djangorestframework==3.16.1
-djangorestframework-simplejwt==5.5.1
-python-dotenv==1.1.1
+Django==6.1
+
+# Environment and API support
+python-dotenv
+requests
+
+# REST API and auth
+djangorestframework
+djangorestframework-simplejwt

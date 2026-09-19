@@ -1,125 +1,52 @@
-import json
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+"""Views for the public landing page and signed-in dashboard shell."""
 
-from django.conf import settings
+import requests
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-
-def api_request(method, path, payload=None, access_token=None):
-    url = f'{settings.API_BASE_URL}{path}'
-    if method == 'GET' and payload:
-        url = f'{url}?{urlencode(payload)}'
-
-    body = json.dumps(payload).encode() if payload and method != 'GET' else None
-    headers = {'Content-Type': 'application/json'}
-    if access_token:
-        headers['Authorization'] = f'Bearer {access_token}'
-
-    request = Request(url, data=body, headers=headers, method=method)
-    try:
-        with urlopen(request, timeout=5) as response:
-            response_body = response.read()
-            return response.status, json.loads(response_body) if response_body else {}
-    except HTTPError as error:
-        response_body = error.read()
-        try:
-            data = json.loads(response_body) if response_body else {}
-        except json.JSONDecodeError:
-            data = {'detail': 'The API returned an invalid response.'}
-        return error.code, data
-    except URLError:
-        return None, {'detail': 'The user API is unavailable.'}
-
-
-def api_error(data):
-    if 'detail' in data:
-        return data['detail']
-    return '; '.join(
-        str(message)
-        for messages in data.values()
-        for message in (messages if isinstance(messages, list) else [messages])
-    )
+from apps.users.auth import authenticated_required, get_authenticated_user
 
 
 def landing(request):
+    # Public page for visitors.
     return render(request, 'landing.html')
 
 
-def login(request):
-    if request.session.get('access_token'):
-        return redirect('home')
+def _fetch_fabrics_from_api(request):
+    """Fetch the authenticated fabric list through the shared session auth gate.
 
-    error = None
-    if request.method == 'POST':
-        status, data = api_request('POST', 'login/', {
-            'email': request.POST.get('email', ''),
-            'password': request.POST.get('password', ''),
-        })
-        if status == 200:
-            request.session['access_token'] = data['access']
-            request.session['refresh_token'] = data['refresh']
-            request.session['api_user'] = data['user']
-            return redirect('home')
-        error = api_error(data)
+    The project does not silently fall back to an empty list when the API fails;
+    the caller handles the error and tells the user clearly that the catalog is
+    temporarily unavailable.
+    """
+    user = get_authenticated_user(request)
+    if user is None:
+        return {'error': 'Your session is no longer valid. Please sign in again.'}, None
 
-    return render(request, 'login.html', {'error': error})
-
-
-def register(request):
-    if request.session.get('access_token'):
-        return redirect('home')
-
-    error = None
-    if request.method == 'POST':
-        status, data = api_request('POST', 'register/', {
-            'full_name': request.POST.get('fullname', ''),
-            'email': request.POST.get('email', ''),
-            'phone': request.POST.get('phone', ''),
-            'password': request.POST.get('password', ''),
-            'password_confirmation': request.POST.get('repeat_password', ''),
-        })
-        if status == 201:
-            return redirect('login')
-        error = api_error(data)
-
-    return render(request, 'register.html', {'error': error})
+    api_url = request.build_absolute_uri('/api/fabrics/list/')
+    try:
+        response = requests.get(api_url, cookies=request.COOKIES, timeout=10)
+        if response.status_code == 200:
+            return None, response.json()
+        if response.status_code == 401:
+            return {'error': 'Your session is no longer valid. Please sign in again.'}, None
+        return {'error': 'The fabric catalog is temporarily unavailable. Please try again shortly.'}, None
+    except requests.RequestException:
+        return {'error': 'We could not load the fabric catalog at this time. Please try again shortly.'}, None
 
 
+# Private page for logged-in users.
+@authenticated_required
 def home(request):
-    access_token = request.session.get('access_token')
-    user = request.session.get('api_user')
-    if not access_token or not user:
-        return redirect('login')
-
-    status, data = api_request(
-        'GET',
-        'profile/',
-        {'email': user.get('email', '')},
-        access_token,
-    )
-    if status != 200:
-        request.session.flush()
-        return redirect('login')
-
-    request.session['api_user'] = data
-    return render(request, 'home.html', {'user': data})
+    error, fabrics = _fetch_fabrics_from_api(request)
+    return render(request, 'home.html', {'fabrics': fabrics, 'error': error})
 
 
 def signout(request):
+    """Log the user out and return them to the public landing page."""
     if request.method == 'POST':
-        user = request.session.get('api_user', {})
-        api_request(
-            'POST',
-            'logout/',
-            {
-                'email': user.get('email', ''),
-                'refresh': request.session.get('refresh_token', ''),
-            },
-            request.session.get('access_token'),
-        )
-        request.session.flush()
-        return redirect('login')
+        logout(request)
+        return redirect('landing')
 
     return redirect('home')
