@@ -1,5 +1,5 @@
 # Core framework
-Django==6.1
+Django>=5.2,<6.0
 
 # Environment and API support
 python-dotenv
