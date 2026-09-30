@@ -9,8 +9,21 @@
             <p class="text-uppercase text-muted fw-semibold mb-1">TailorSense</p>
             <h1 class="mb-0">Fabrics Dashboard</h1>
         </div>
-        <a href="{% url 'home' %}" class="btn btn-outline-dark">Back to Home</a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'home' %}" class="btn btn-outline-dark">Back to Home</a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFabricModal">
+                Add Fabric
+            </button>
+        </div>
     </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
 
     {% if fabrics %}
         <div class="row g-4">
@@ -55,5 +68,81 @@
             No fabrics are available in the catalog yet.
         </div>
     {% endif %}
+</div>
+
+<div class="modal fade" id="addFabricModal" tabindex="-1" aria-labelledby="addFabricModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="{% url 'add-fabric' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="addFabricModalLabel">Add a Fabric</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Enter the properties used to assess the fabric for tailoring recommendations.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="fabric_name">Fabric name</label>
+                            <input class="form-control" id="fabric_name" name="fabric_name" maxlength="150" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="fiber_category">Fiber category</label>
+                            <input class="form-control" id="fiber_category" name="fiber_category" maxlength="100" placeholder="Natural, synthetic, or blend" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="fiber">Fiber</label>
+                            <input class="form-control" id="fiber" name="fiber" maxlength="50" placeholder="Cotton" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="fabric_type">Fabric type</label>
+                            <input class="form-control" id="fabric_type" name="fabric_type" maxlength="100" placeholder="Poplin" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="composition">Composition</label>
+                            <input class="form-control" id="composition" name="composition" maxlength="200" placeholder="100% cotton" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="construction">Construction</label>
+                            <input class="form-control" id="construction" name="construction" maxlength="100" placeholder="Woven" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="weight">Weight</label>
+                            <input class="form-control" id="weight" name="weight" maxlength="100" placeholder="120 gsm" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="structure">Structure</label>
+                            <input class="form-control" id="structure" name="structure" maxlength="20" placeholder="Plain weave" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="stretch">Stretch</label>
+                            <select class="form-select" id="stretch" name="stretch" required>
+                                <option value="" selected disabled>Choose…</option>
+                                <option value="none">None</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="breathability">Breathability</label>
+                            <select class="form-select" id="breathability" name="breathability" required>
+                                <option value="" selected disabled>Choose…</option>
+                                <option value="none">None</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="opacity">Opacity</label>
+                            <select class="form-select" id="opacity" name="opacity" required>
+                                <option value="" selected disabled>Choose…</option>
+                                <option value="none">None</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Fabric</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

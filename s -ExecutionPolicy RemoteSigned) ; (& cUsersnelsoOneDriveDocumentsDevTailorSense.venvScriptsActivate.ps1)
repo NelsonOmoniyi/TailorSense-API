@@ -1,0 +1,164 @@
+*   [33mcommit 0fde05951e226798cc7581e129e12ff02d45fca0[m[33m ([m[1;31morigin/users[m[33m, [m[1;32musers[m[33m)[m
+[31m|[m[32m\[m  Merge: 4ebe27b e7bc336
+[31m|[m [32m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[31m|[m [32m|[m Date:   Sat Sep 19 19:28:07 2026 +0100
+[31m|[m [32m|[m 
+[31m|[m [32m|[m     Merge branch 'main' into users
+[31m|[m [32m|[m 
+[31m|[m * [33mcommit e7bc3360f49ac2215b5eabb01eb14564c39b4834[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/styles[m[33m, [m[1;31morigin/recommendations[m[33m, [m[1;31morigin/measurements[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/fabrics[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mstyles[m[33m, [m[1;32mrecommendations[m[33m, [m[1;32mmeasurements[m[33m, [m[1;32mfabrics[m[33m)[m
+[31m|[m [32m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[31m|[m [32m|[m Date:   Sat Sep 19 19:22:08 2026 +0100
+[31m|[m [32m|[m 
+[31m|[m [32m|[m     Fixed fabrics dashboard
+[31m|[m [32m|[m 
+* [32m|[m [33mcommit 4ebe27b642a6a6b99123078882f183b160cac732[m
+[33m|[m[32m\[m[32m|[m Merge: 19cd91d 773cd43
+[33m|[m [32m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [32m|[m Date:   Sat Sep 19 19:05:37 2026 +0100
+[33m|[m [32m|[m 
+[33m|[m [32m|[m     Merge branch 'main' into users
+[33m|[m [32m|[m     
+[33m|[m [32m|[m     # Conflicts:
+[33m|[m [32m|[m     #       README.md
+[33m|[m [32m|[m     #       apps/core/views.py
+[33m|[m [32m|[m     #       apps/users/views.py
+[33m|[m [32m|[m     #       config/settings.py
+[33m|[m [32m|[m     #       config/urls.py
+[33m|[m [32m|[m     #       requirements.txt
+[33m|[m [32m|[m     #       templates/home.html
+[33m|[m [32m|[m     
+[33m|[m [32m|[m *   [33mcommit a7daa56aa8bd63ee7b25d2f6bdda4f5a2912435b[m[33m ([m[1;35mrefs/stash[m[33m)[m
+[33m|[m [32m|[m [35m|[m[36m\[m  Merge: ee2e7b5 a6eae8f
+[33m|[m [32m|[m [35m|[m [36m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [32m|[m [35m|[m [36m|[m Date:   Sat Sep 19 19:15:11 2026 +0100
+[33m|[m [32m|[m [35m|[m [36m|[m 
+[33m|[m [32m|[m [35m|[m [36m|[m     On main: preserve-apps-config-before-pull-revert
+[33m|[m [32m|[m [35m|[m [36m|[m 
+[33m|[m [32m|[m [35m|[m * [33mcommit a6eae8f7eb0d34c79cdd3fcdd9577ea0055f34f3[m
+[33m|[m [32m|[m [35m|[m[35m/[m  Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [32m|[m [35m|[m   Date:   Sat Sep 19 19:15:11 2026 +0100
+[33m|[m [32m|[m [35m|[m   
+[33m|[m [32m|[m [35m|[m       index on main: ee2e7b5 merge fabric to main
+[33m|[m [32m|[m [35m|[m   
+[33m|[m [32m|[m *   [33mcommit ee2e7b5a8b0b9d72b9a616a6babceb980f7a5341[m[33m ([m[1;32mbackup-before-restore-20260919[m[33m)[m
+[33m|[m [32m|[m [1;31m|[m[32m\[m  Merge: fabaa39 773cd43
+[33m|[m [32m|[m [1;31m|[m[32m/[m  Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [32m|[m[32m/[m[1;31m|[m   Date:   Sat Sep 19 18:25:17 2026 +0100
+[33m|[m [32m|[m [1;31m|[m   
+[33m|[m [32m|[m [1;31m|[m       merge fabric to main
+[33m|[m [32m|[m [1;31m|[m 
+[33m|[m * [1;31m|[m [33mcommit 773cd4357fccfb8137de7a6b3c88d8b99516bd07[m
+[33m|[m [1;32m|[m [1;31m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [1;32m|[m [1;31m|[m Date:   Sat Sep 19 17:57:33 2026 +0100
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m [1;32m|[m [1;31m|[m     Added Data to the fabrics DB and fixed fabrics dashboard
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m * [1;31m|[m [33mcommit 85c31b246177c3d3b4108b4185e44433b1c0580f[m
+[33m|[m [1;32m|[m [1;31m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [1;32m|[m [1;31m|[m Date:   Sat Sep 19 17:02:58 2026 +0100
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m [1;32m|[m [1;31m|[m     Created fabric models and database for viewing the list of fabrics and adding fabrics
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m * [1;31m|[m [33mcommit 346111f101f0f2bef28d37c3c4757b11f0543ad8[m
+[33m|[m [1;32m|[m [1;31m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [1;32m|[m [1;31m|[m Date:   Fri Sep 18 14:50:06 2026 +0100
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m [1;32m|[m [1;31m|[m     Re-structured fabrics database model
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m * [1;31m|[m [33mcommit 0fdb5b4e653cc220c94148412dd69245700c1318[m
+[33m|[m [1;32m|[m [1;31m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [1;32m|[m [1;31m|[m Date:   Fri Sep 18 14:19:17 2026 +0100
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m [1;32m|[m [1;31m|[m     built fabrics interface, made app responsive, built fabrics api
+[33m|[m [1;32m|[m [1;31m|[m 
+[33m|[m [1;32m|[m * [33mcommit fabaa39d8bee0d5a71dc84b0b18c833b81a7ae2a[m
+[33m|[m [1;32m|[m [1;32m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [1;32m|[m [1;32m|[m Date:   Fri Sep 18 12:43:36 2026 +0100
+[33m|[m [1;32m|[m [1;32m|[m 
+[33m|[m [1;32m|[m [1;32m|[m     Add Fabrics App for Dev
+[33m|[m [1;32m|[m [1;32m|[m 
+[33m|[m [1;32m|[m * [33mcommit 2a4c632e2305f9727bd42dd6e43916959a2aa597[m
+[33m|[m [1;32m|[m [1;32m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m [1;32m|[m [1;32m|[m Date:   Fri Sep 18 12:17:41 2026 +0100
+[33m|[m [1;32m|[m [1;32m|[m 
+[33m|[m [1;32m|[m [1;32m|[m     Standardize .env file handling making sure it is referenced where needed
+[33m|[m [1;32m|[m [1;32m|[m   
+[33m|[m [1;32m|[m [1;32m|[m * [33mcommit 87ff8504a8856b64852b0662f9766c7575b5ea79[m[33m ([m[1;32mbackup-before-revert-2026-09-17[m[33m)[m
+[33m|[m [1;32m|[m [1;32m|[m[1;32m/[m[33m|[m Merge: 55ea20e 19cd91d
+[33m|[m [1;32m|[m[33m_[m[1;32m|[m[33m/[m  Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[33m|[m[33m/[m[1;32m|[m [1;32m|[m   Date:   Thu Sep 17 18:27:22 2026 +0100
+[33m|[m [1;32m|[m [1;32m|[m   
+[33m|[m [1;32m|[m [1;32m|[m       Merge users into main
+[33m|[m [1;32m|[m [1;32m|[m 
+* [1;32m|[m [1;32m|[m [33mcommit 19cd91dc889dba9bb6d51eeb760422e8b08df360[m
+[1;34m|[m [1;32m|[m [1;32m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;34m|[m [1;32m|[m [1;32m|[m Date:   Tue Sep 15 19:26:51 2026 +0100
+[1;34m|[m [1;32m|[m [1;32m|[m 
+[1;34m|[m [1;32m|[m [1;32m|[m     User actual API calls in core app
+[1;34m|[m [1;32m|[m [1;32m|[m 
+[1;34m|[m [1;32m|[m * [33mcommit 55ea20ead7a8294e2a691697126cb90eb00afe71[m
+[1;34m|[m [1;32m|[m [1;34m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;34m|[m [1;32m|[m [1;34m|[m Date:   Tue Sep 15 18:55:53 2026 +0100
+[1;34m|[m [1;32m|[m [1;34m|[m 
+[1;34m|[m [1;32m|[m [1;34m|[m     Adjusted API Key Structure
+[1;34m|[m [1;32m|[m [1;34m|[m 
+[1;34m|[m [1;32m|[m * [33mcommit 4d495f106bf641426f6970b5553bc1634332db0c[m
+[1;34m|[m [1;32m|[m[1;34m/[m  Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;34m|[m[1;34m/[m[1;32m|[m   Date:   Tue Sep 15 18:06:35 2026 +0100
+[1;34m|[m [1;32m|[m   
+[1;34m|[m [1;32m|[m       Fit .env error
+[1;34m|[m [1;32m|[m 
+* [1;32m|[m [33mcommit fcaae782447220e77d8a0a3289f7aa69f90452f1[m
+[1;34m|[m [1;32m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;34m|[m [1;32m|[m Date:   Wed Sep 9 16:35:04 2026 +0100
+[1;34m|[m [1;32m|[m 
+[1;34m|[m [1;32m|[m     Added API Documentation, complete User API Registration, Login and Profile Data
+[1;34m|[m [1;32m|[m 
+* [1;32m|[m [33mcommit 907941aded0d1eddbbd3551da51dbc985eac5e6f[m
+[1;32m|[m[1;32m/[m  Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;32m|[m   Date:   Wed Sep 9 15:01:29 2026 +0100
+[1;32m|[m   
+[1;32m|[m       update project structure converting the user-login to an API for userlogin and registration
+[1;32m|[m 
+* [33mcommit 4a86b39853304664fd81ff52d2ff66459b158fb0[m
+[1;34m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;34m|[m Date:   Tue Sep 8 21:17:24 2026 +0100
+[1;34m|[m 
+[1;34m|[m     Basic User authentication completed
+[1;34m|[m 
+* [33mcommit 3c79d47bda5017273c7e9da30361193f08dadbbf[m
+[1;34m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;34m|[m Date:   Tue Sep 8 21:00:14 2026 +0100
+[1;34m|[m 
+[1;34m|[m     User authentication started with Login and Sin-In forms being created
+[1;34m|[m 
+* [33mcommit 6715df7d06d458be8bec8839743e1791ad842fae[m
+[1;34m|[m Author: beeadelight <beeadelight@gmail.com>
+[1;34m|[m Date:   Tue Sep 8 03:53:49 2026 +0100
+[1;34m|[m 
+[1;34m|[m     Update TailorSense landing page and add new files.
+[1;34m|[m 
+* [33mcommit a6f4736c6005e4ee0cb36eb4a5bb7632e752cde3[m
+[1;34m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;34m|[m Date:   Sun Sep 6 19:45:24 2026 +0100
+[1;34m|[m 
+[1;34m|[m     Added new stakeholder username to license
+[1;34m|[m   
+*   [33mcommit 66270f5343e3c138f437475de819917a52658952[m
+[1;35m|[m[1;36m\[m  Merge: 0eec8b9 31b3143
+[1;35m|[m [1;36m|[m Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+[1;35m|[m [1;36m|[m Date:   Sat Sep 5 11:11:39 2026 +0100
+[1;35m|[m [1;36m|[m 
+[1;35m|[m [1;36m|[m     chore: merge existing remote history
+[1;35m|[m [1;36m|[m 
+[1;35m|[m * [33mcommit 31b3143597813b2776af8f7360b656f7f8f938c0[m
+[1;35m|[m   Author: Nelson_Omoniyi <nelsonwumi6@gmail.com>
+[1;35m|[m   Date:   Sat Sep 5 11:07:56 2026 +0100
+[1;35m|[m   
+[1;35m|[m       Initial commit
+[1;35m|[m 
+* [33mcommit 0eec8b9073d23d1913be98adc0f7de31cd3c5105[m
+  Author: Nelson Omoniyi <nelsonwumi6@gmail.com>
+  Date:   Sat Sep 5 11:11:39 2026 +0100
+  
+      feat: add users app and API structure
