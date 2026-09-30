@@ -1,13 +1,204 @@
 {% include 'partials/head.html' %}
 
-<!-- Private home page shown after a successful login. -->
-<main>
-    <h1>Welcome to TailorSense</h1>
-    <p>You are signed in as {{ request.user.email|default:request.user.username }}.</p>
-    <form action="{% url 'signout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Sign Out</button>
-    </form>
+<main class="home-page">
+
+    <header class="home-header">
+        <a href="/" class="home-brand" aria-label="TailorSense home">
+            <img
+                src="{% static 'images/tailorsense-logo.png' %}"
+                alt="TailorSense"
+                class="home-brand-logo"
+            >
+        </a>
+
+        <nav class="home-nav" aria-label="Main navigation">
+            <a href="#" class="home-nav-link">Styles</a>
+            <a href="#" class="home-nav-link">Fabrics</a>
+            <a href="#" class="home-nav-link">Measurements</a>
+
+            <button class="profile-button" type="button">
+                <span class="profile-avatar">
+                    {{ request.user.username|default:"U"|first|upper }}
+                </span>
+                <span class="profile-name">
+                    {{ request.user.username|default:"User" }}
+                </span>
+                <span class="profile-chevron">⌄</span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="home-content">
+
+        <section class="welcome-section">
+            <div class="welcome-copy">
+                <h1>
+                    Good to see you,
+                    <span>{{ request.user.first_name|default:request.user.username|default:"there" }}.</span>
+                </h1>
+                <p>
+                    Let's bring your fashion idea to life. Explore styles,
+                    work with your measurements, discover fabrics, and create
+                    something uniquely yours.
+                </p>
+            </div>
+
+            <div class="welcome-actions">
+                <a href="#" class="home-primary-btn">
+                    <span class="button-icon">✦</span>
+                    Create a Style
+                    <span class="button-arrow">→</span>
+                </a>
+                <a href="#" class="home-secondary-btn">Explore Styles</a>
+            </div>
+        </section>
+
+        <section class="journey-card" aria-labelledby="journey-title">
+            <div class="journey-heading">
+                <div>
+                    <p class="home-eyebrow">HOW IT WORKS</p>
+                    <h2 id="journey-title">
+                        From idea to <span>finished style.</span>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="journey-steps">
+                <div class="journey-step">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">✦</div>
+                    <h3>Choose a Style</h3>
+                    <p>Explore Nigerian and international styles and find the look you love.</p>
+                </div>
+
+                <div class="journey-line"></div>
+
+                <div class="journey-step">
+                    <div class="step-number">02</div>
+                    <div class="step-icon">◇</div>
+                    <h3>Add Your Measurements</h3>
+                    <p>Use your measurements to help personalize the selected design.</p>
+                </div>
+
+                <div class="journey-line"></div>
+
+                <div class="journey-step">
+                    <div class="step-number">03</div>
+                    <div class="step-icon">◈</div>
+                    <h3>Select Your Fabric</h3>
+                    <p>Explore fabric options and see how they complement your chosen style.</p>
+                </div>
+
+                <div class="journey-line"></div>
+
+                <div class="journey-step">
+                    <div class="step-number">04</div>
+                    <div class="step-icon">✂</div>
+                    <h3>Draft &amp; Create</h3>
+                    <p>Get guidance for drafting your pattern and cutting your fabric.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="explore-section" aria-labelledby="explore-title">
+            <div class="section-heading">
+                <div>
+                    <p class="home-eyebrow">EXPLORE</p>
+                    <h2 id="explore-title">
+                        Everything you need, <span>in one hub.</span>
+                    </h2>
+                </div>
+                <p>Jump into the part of the tailoring journey you want to work on.</p>
+            </div>
+
+            <div class="explore-grid">
+                <a href="#" class="explore-card explore-card-featured">
+                    <div class="explore-card-top">
+                        <span class="explore-icon">✦</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                    <div>
+                        <p class="card-label">CREATE</p>
+                        <h3>Create a Style</h3>
+                        <p>Start with your fashion idea and build a personalized style step by step.</p>
+                    </div>
+                </a>
+
+                <a href="#" class="explore-card">
+                    <div class="explore-card-top">
+                        <span class="explore-icon">◇</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                    <div>
+                        <p class="card-label">DISCOVER</p>
+                        <h3>Browse Styles</h3>
+                        <p>Explore styles and discover inspiration for your next outfit.</p>
+                    </div>
+                </a>
+
+                <a href="#" class="explore-card">
+                    <div class="explore-card-top">
+                        <span class="explore-icon">◈</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                    <div>
+                        <p class="card-label">PERSONALIZE</p>
+                        <h3>My Measurements</h3>
+                        <p>Save and manage your measurements for a more personalized fit.</p>
+                    </div>
+                </a>
+
+                <a href="#" class="explore-card">
+                    <div class="explore-card-top">
+                        <span class="explore-icon">▱</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                    <div>
+                        <p class="card-label">MATERIALS</p>
+                        <h3>Explore Fabrics</h3>
+                        <p>Discover fabrics and understand how they work with different styles.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="recent-section" aria-labelledby="recent-title">
+            <div class="section-heading compact">
+                <div>
+                    <p class="home-eyebrow">YOUR SPACE</p>
+                    <h2 id="recent-title">Pick up where <span>you left off.</span></h2>
+                </div>
+                <a href="#" class="view-all-link">View all →</a>
+            </div>
+
+            <div class="empty-state">
+                <div class="empty-icon">✂</div>
+                <h3>Your style journey starts here.</h3>
+                <p>
+                    You haven't created a style yet. Start your first one and
+                    TailorSense will help you work through the process.
+                </p>
+                <a href="#" class="home-primary-btn small">
+                    Create a Style
+                    <span class="button-arrow">→</span>
+                </a>
+            </div>
+        </section>
+
+    </section>
+
+    <footer class="home-footer">
+        <p>© 2026 TailorSense</p>
+        <div>
+            <a href="#">About Us</a>
+            <a href="#">Help</a>
+            <form action="{% url 'signout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Sign Out</button>
+            </form>
+        </div>
+    </footer>
+
 </main>
 
 {% include 'partials/footer.html' %}
