@@ -27,3 +27,16 @@ class FabricSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+        extra_kwargs = {
+            'fabric_name': {'required': True, 'allow_blank': False},
+            'fiber_category': {'required': True, 'allow_blank': False},
+            'fiber': {'required': True, 'allow_blank': False},
+            'fabric_type': {'required': True, 'allow_blank': False},
+            'composition': {'required': True, 'allow_blank': False},
+            'construction': {'required': True, 'allow_blank': False},
+            'weight': {'required': True, 'allow_blank': False},
+            'stretch': {'required': True},
+            'structure': {'required': True, 'allow_blank': False},
+            'breathability': {'required': True},
+            'opacity': {'required': True},
+        }

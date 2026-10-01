@@ -45,7 +45,7 @@ class Fabric(models.Model):
         ordering = ['fabric_name']
 
     def __str__(self):
-        return self.name
+        return self.fabric_name
 
 
 
