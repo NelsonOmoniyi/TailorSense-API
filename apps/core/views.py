@@ -1,9 +1,9 @@
 """Views for the public landing page and signed-in dashboard shell."""
 
 import requests
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
@@ -13,6 +13,89 @@ from apps.users.auth import authenticated_required, get_authenticated_user
 def landing(request):
     # Public page for visitors.
     return render(request, 'landing.html')
+
+
+def _api_error_message(response, fallback):
+    try:
+        payload = response.json()
+    except ValueError:
+        return fallback
+
+    if not isinstance(payload, dict):
+        return fallback
+    if payload.get('detail'):
+        return str(payload['detail'])
+
+    errors = []
+    for field, messages_for_field in payload.items():
+        if not isinstance(messages_for_field, (list, tuple)):
+            messages_for_field = [messages_for_field]
+        errors.extend(
+            f"{field.replace('_', ' ').capitalize()}: {message}"
+            for message in messages_for_field
+        )
+    return '; '.join(errors) or fallback
+
+
+def _api_headers(request):
+    csrf_token = request.COOKIES.get(settings.CSRF_COOKIE_NAME)
+    return {'X-CSRFToken': csrf_token} if csrf_token else {}
+
+
+def _copy_api_cookies(api_response, response):
+    for name, value in api_response.cookies.items():
+        is_session = name == settings.SESSION_COOKIE_NAME
+        response.set_cookie(
+            name,
+            value,
+            httponly=settings.SESSION_COOKIE_HTTPONLY if is_session else settings.CSRF_COOKIE_HTTPONLY,
+            secure=settings.SESSION_COOKIE_SECURE if is_session else settings.CSRF_COOKIE_SECURE,
+            samesite=settings.SESSION_COOKIE_SAMESITE if is_session else settings.CSRF_COOKIE_SAMESITE,
+        )
+
+
+def register(request):
+    error = None
+    if request.method == 'POST':
+        try:
+            api_response = requests.post(
+                request.build_absolute_uri('/api/users/register/'),
+                data=request.POST,
+                cookies=request.COOKIES,
+                headers=_api_headers(request),
+                timeout=10,
+            )
+        except requests.RequestException:
+            error = 'Registration is temporarily unavailable. Please try again shortly.'
+        else:
+            if api_response.status_code == 201:
+                return redirect('login')
+            error = _api_error_message(api_response, 'We could not create your account.')
+
+    return render(request, 'register.html', {'error': error})
+
+
+def login(request):
+    error = None
+    if request.method == 'POST':
+        try:
+            api_response = requests.post(
+                request.build_absolute_uri('/api/users/login/'),
+                data=request.POST,
+                cookies=request.COOKIES,
+                headers=_api_headers(request),
+                timeout=10,
+            )
+        except requests.RequestException:
+            error = 'Sign in is temporarily unavailable. Please try again shortly.'
+        else:
+            if api_response.status_code == 200:
+                response = redirect('home')
+                _copy_api_cookies(api_response, response)
+                return response
+            error = _api_error_message(api_response, 'Invalid email or password.')
+
+    return render(request, 'login.html', {'error': error})
 
 
 def _fetch_fabrics_from_api(request):
@@ -46,7 +129,6 @@ def home(request):
 
 
 @authenticated_required
-@login_required
 def fabric_dashboard(request):
     """Render the fabric catalogue from the fabrics API response."""
     error, fabrics = _fetch_fabrics_from_api(request)
@@ -98,8 +180,17 @@ def add_fabric(request):
 
 
 def signout(request):
-    """Log the user out and return them to the public landing page."""
+    """Call the account API, clear the browser session, and return to the landing page."""
     if request.method == 'POST':
+        try:
+            requests.post(
+                request.build_absolute_uri('/api/users/signout/'),
+                cookies=request.COOKIES,
+                headers=_api_headers(request),
+                timeout=10,
+            )
+        except requests.RequestException:
+            pass
         logout(request)
         return redirect('landing')
 

@@ -6,58 +6,63 @@ This guide documents the interfaces that are actually implemented in the current
 
 ## Current project reality
 
-The current TailorSense app uses a mixed architecture:
-
-- Public user access is handled by server-rendered Django pages for register and login.
-- Signed-in user pages use Django session authentication.
-- The only JSON API currently implemented in this project is the authenticated fabric inventory API.
-- The core app fetches that API using the active user session and then passes the data to the web interface.
-
-This means the project is not yet a full JWT-first JSON API service for every user action. The user account flow is still web-based for now, and the fabric feature is the first authenticated API exposed to the app.
+The core app owns all server-rendered HTML and browser form handling. It delegates account and fabric operations to JSON APIs. Authentication uses Django sessions.
 
 ## Authentication model
 
-### Web app authentication
+### Browser authentication
 
 - Anonymous users can access `/` and `/login/` and `/register/`.
-- After login, the app sets a Django session cookie.
+- Core submits login to the user API and relays the resulting session cookie to the browser.
 - Protected pages such as `/home/` and `/fabrics/` rely on the user session.
 
 ### API authentication
 
-- Browser-based API requests use the active session cookie.
-- The API expects an authenticated Django user session, not a separate API key.
-- For the current implementation, session authentication is the supported pattern for the fabric API.
+- Core passes the active session cookie when calling authenticated APIs.
+- Fabric list/add and signout require a valid authenticated Django session.
+- Registration and login are public JSON API endpoints.
 
 ## Implemented endpoints
 
-### 1. Public web pages
+### 1. Core-rendered pages
 
 | Method | Endpoint | Auth | Purpose |
 |---|---|---|---|
 | `GET` | `/` | None | Public landing page |
-| `GET` / `POST` | `/login/` | None | Login page and authentication |
-| `GET` / `POST` | `/register/` | None | Registration page and user creation |
+| `GET` / `POST` | `/login/` | None | Login page; form delegates to the user API |
+| `GET` / `POST` | `/register/` | None | Registration page; form delegates to the user API |
 
 ### 2. Signed-in web pages
 
 | Method | Endpoint | Auth | Purpose |
 |---|---|---|---|
 | `GET` | `/home/` | Session user | Signed-in dashboard shell |
-| `POST` | `/signout/` | Session user | Logout action |
+| `POST` | `/signout/` | Session user | Signout action; delegates to the user API |
 | `GET` | `/fabrics/` | Session user | Fabric dashboard page |
 
-### 3. Fabric API
+### 3. User API
+
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `POST` | `/api/users/register/` | None | Create an account and phone profile |
+| `POST` | `/api/users/login/` | None | Authenticate email/password and establish a session |
+| `POST` | `/api/users/signout/` | Session user | Invalidate the current session |
+
+Registration request fields: `fullname`, `email`, `phone`, `password`, and `repeat_password`.
+Login request fields: `email` and `password`.
+
+### 4. Fabric API
 
 | Method | Endpoint | Auth | Purpose |
 |---|---|---|---|
 | `GET` | `/api/fabrics/list/` | Session-authenticated user | Return all fabrics available in the system |
+| `POST` | `/api/fabrics/add/` | Session-authenticated user | Validate and create a fabric |
 
 ## How the fabric API is used
 
 The signed-in dashboard flow is:
 
-1. A user logs in through Django's web login.
+1. Core submits the login form to the user API.
 2. The browser keeps the session cookie.
 3. The core app calls `/api/fabrics/list/` with that session attached.
 4. The API returns the fabric list as JSON.
@@ -79,14 +84,17 @@ Cookie: sessionid=your-session-cookie
 [
   {
     "id": 1,
-    "name": "Cotton Twill",
-    "category": "Cotton",
+    "fabric_name": "Cotton Twill",
+    "fiber_category": "Natural",
+    "fiber": "Cotton",
+    "fabric_type": "Twill",
     "composition": "100% Cotton",
-    "color": "Navy",
-    "weight_gsm": 220,
-    "price_per_meter": "12.50",
-    "stock_units": 25,
-    "supplier": "Local Mill",
+    "construction": "Woven",
+    "weight": "220 gsm",
+    "stretch": "none",
+    "structure": "Twill",
+    "breathability": "high",
+    "opacity": "medium",
     "created_at": "2026-09-18T12:00:00Z",
     "updated_at": "2026-09-18T12:00:00Z"
   }
@@ -98,18 +106,6 @@ Cookie: sessionid=your-session-cookie
 - `200 OK` when the user is authenticated and fabric records are found.
 - Empty array `[]` when the user is authenticated but no fabrics exist yet.
 - An authentication failure when the session is not valid.
-
-## Future API expansion
-
-The project may grow to include more JSON endpoints later, such as:
-
-- user registration API
-- user login API
-- user profile API
-- JWT token endpoints
-- additional inventory and tailoring APIs
-
-These are not currently implemented in this branch. This guide intentionally documents the live implementation rather than hypothetical features.
 
 ## Important guidance for developers
 

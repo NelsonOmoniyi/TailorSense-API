@@ -1,9 +1,9 @@
 from django.urls import path
-from . import views
+
+from . import api_views
 
 urlpatterns = [
-    # Registration is available at the users namespace root.
-    path('', views.register, name='register'),
-    # Login is available as a nested users route.
-    path('login/', views.login, name='login'),
+    path('register/', api_views.register, name='user-api-register'),
+    path('login/', api_views.login, name='user-api-login'),
+    path('signout/', api_views.signout, name='user-api-signout'),
 ]

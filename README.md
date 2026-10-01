@@ -1,6 +1,6 @@
 # TailorSense
 
-TailorSense is a Django application for personalized tailoring and fabric selection. The project combines a public landing page, a signed-in user flow, and an authenticated fabric inventory API that feeds the UI for logged-in users.
+TailorSense is a Django application for personalized tailoring and fabric selection. The core app owns the browser UI and delegates account and fabric operations to JSON APIs.
 
 ## Project goals
 
@@ -26,9 +26,9 @@ TailorSense is a Django application for personalized tailoring and fabric select
 ```text
 TailorSense/
 ├── apps/
-│   ├── core/                 # Public pages and signed-in dashboard shell
-│   ├── fabrics/              # Fabric model, API, dashboard and routes
-│   └── users/                # Web auth and account handling
+│   ├── core/                 # All rendered pages and browser form handling
+│   ├── fabrics/              # Fabric model and JSON API
+│   └── users/                # Account profile and JSON API
 ├── config/                   # Django settings and project routing
 ├── templates/                # Shared and app-specific HTML templates
 ├── static/                   # Shared CSS and static assets
@@ -45,42 +45,29 @@ TailorSense/
 
 ## The apps and what they do
 
-- `apps/core` — contains the public landing page and the authenticated home page shell.
-- `apps/users` — handles the sign-up and login flow used by the web application.
-- `apps/fabrics` — stores fabric inventory data, provides the fabric API, and renders the dashboard UI.
+- `apps/core` — owns all HTML pages and browser-facing form handling, and calls the APIs.
+- `apps/users` — stores account profile data and provides registration, login, and signout APIs.
+- `apps/fabrics` — stores fabric inventory data and provides the fabric API.
 - `config` — central Django settings and root URL configuration.
 - `templates` — reusable Bootstrap layout and page templates.
 
 ## Authentication pattern
 
-The current project follows a realistic layered approach:
-
-- Public routes remain open for user registration and sign-in.
-- The web app uses Django session authentication for signed-in pages.
-- The fabric API is protected and expects authenticated users.
-- The core app calls the API using the current session cookies and then passes the returned data into the page context.
-- JWT support is still available for API-based clients, but the current fabric feature is designed for the already-signed-in user experience.
+- Core renders the public and signed-in pages and handles browser forms.
+- The user API provides registration, login, and signout operations.
+- The fabric API provides list and add operations and requires an authenticated session.
+- Core delegates form operations to APIs using the active session cookies.
 
 ## Current API surface
 
-The project currently contains one implemented JSON API endpoint and several web routes.
+- `POST /api/users/register/` — creates an account and phone profile.
+- `POST /api/users/login/` — authenticates credentials and establishes a Django session.
+- `POST /api/users/signout/` — ends the authenticated Django session.
+- `GET /api/fabrics/list/` — returns the fabric catalog for an authenticated session.
+- `POST /api/fabrics/add/` — validates and creates a fabric.
 
-### Implemented API
-
-- `GET /api/fabrics/list/` — returns the list of available fabrics for the authenticated user session.
-
-### Web-only routes
-
-- `/login/` — server-rendered login page
-- `/register/` — server-rendered signup page
-- `/home/` — signed-in dashboard shell
-- `/fabrics/` — server-rendered fabric dashboard page
-
-### Planned future APIs
-
-The project may later add dedicated JSON APIs for user auth and profile work, but those are not part of the current live implementation in this branch.
-
-For the live API contract, always refer to [API User Guide/API.md](API%20User%20Guide/API.md). If a route is not documented there, it should be treated as a web route or an unimplemented feature rather than a current API endpoint.
+Core-rendered routes include `/`, `/login/`, `/register/`, `/home/`, and `/fabrics/`.
+For API request and response formats, refer to [API User Guide/API.md](API%20User%20Guide/API.md).
 
 ## Local setup
 
@@ -136,7 +123,11 @@ python manage.py runserver
 | `/register/` | Web registration page |
 | `/home/` | Signed-in home page |
 | `/fabrics/` | Authenticated fabric dashboard |
+| `/api/users/register/` | User registration API |
+| `/api/users/login/` | User login API |
+| `/api/users/signout/` | User signout API |
 | `/api/fabrics/list/` | Protected fabric inventory API |
+| `/api/fabrics/add/` | Protected fabric creation API |
 | `/admin/` | Django administration |
 
 ## Fabric API contract
@@ -156,14 +147,17 @@ Example response:
 [
   {
     "id": 1,
-    "name": "Cotton Twill",
-    "category": "Cotton",
+    "fabric_name": "Cotton Twill",
+    "fiber_category": "Natural",
+    "fiber": "Cotton",
+    "fabric_type": "Twill",
     "composition": "100% Cotton",
-    "color": "Navy",
-    "weight_gsm": 220,
-    "price_per_meter": "12.50",
-    "stock_units": 25,
-    "supplier": "Local Mill",
+    "construction": "Woven",
+    "weight": "220 gsm",
+    "stretch": "none",
+    "structure": "Twill",
+    "breathability": "high",
+    "opacity": "medium",
     "created_at": "2026-09-18T12:00:00Z",
     "updated_at": "2026-09-18T12:00:00Z"
   }
