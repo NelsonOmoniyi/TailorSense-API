@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Styles | TailorSense{% endblock %}
+
+{% block content %}
+{# Styles owns its catalog and filters; real style entries will replace this initial empty state. #}
+<header class="workspace-page-heading">
+	<div>
+		<p class="workspace-page-kicker">STYLE CATALOG</p>
+		<h1>Styles</h1>
+		<p>Browse and manage clothing styles.</p>
+	</div>
+</header>
+
+<section class="workspace-panel catalog-empty-panel" aria-labelledby="style-catalog-title">
+	<div class="workspace-panel-heading">
+		<div>
+			<h2 id="style-catalog-title">Browse styles</h2>
+			<p>Explore clothing styles and save ideas for later.</p>
+		</div>
+	</div>
+	<div class="style-category-strip" aria-label="Style categories">
+		<span class="category-chip is-selected">All styles</span>
+		<span class="category-chip">Formal</span>
+		<span class="category-chip">Casual</span>
+		<span class="category-chip">Traditional</span>
+		<span class="category-chip">Smart casual</span>
+	</div>
+	<div class="workspace-empty-state">
+		<i class="bi bi-stars" aria-hidden="true"></i>
+		<h2>No styles to show yet</h2>
+		<p>Saved and generated styles will appear in this catalog.</p>
+	</div>
+</section>
+{% endblock %}

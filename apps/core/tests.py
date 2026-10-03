@@ -82,4 +82,52 @@ class CoreAccountFlowTests(TestCase):
         self.assertTrue(mock_post.call_args.args[0].endswith('/api/users/signout/'))
         self.assertNotIn('_auth_user_id', self.client.session)
 
+
+class HomeSectionTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='workspace-user', email='workspace@example.com', password='safe-password'
+        )
+        self.client.force_login(self.user)
+        session = self.client.session
+        session['session_key_hash'] = hash_session_key(session.session_key, self.user.email)
+        session['user_email'] = self.user.email
+        session['user_phone'] = ''
+        session.save()
+
+    def test_reference_sections_render_inside_shared_workspace_shell(self):
+        pages = [
+            ('/profile/', 'Profile information', 'home.html'),
+            ('/measurements/', 'No measurement sets yet', 'measurements/dashboard.html'),
+            ('/styles/', 'No styles to show yet', 'styles/dashboard.html'),
+            ('/recommendations/', 'Recommendations are not ready yet', 'recommendations/dashboard.html'),
+            ('/orders/', 'No orders yet', 'home.html'),
+            ('/settings/', 'Notifications', 'home.html'),
+        ]
+
+        for path, expected_content, expected_template in pages:
+            with self.subTest(path=path):
+                response = self.client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'workspace-sidebar')
+                self.assertContains(response, 'workspace-topbar')
+                self.assertContains(response, expected_content)
+                self.assertTemplateUsed(response, expected_template)
+
+    @patch('apps.core.views.requests.get')
+    def test_dashboard_uses_shared_shell_and_real_fabric_count(self, mock_get):
+        mock_get.return_value = SimpleNamespace(
+            status_code=200,
+            json=lambda: [{'fabric_name': 'Cotton Poplin', 'fiber_category': 'Natural', 'composition': '100% cotton'}],
+        )
+
+        response = self.client.get('/home/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<title>Home | TailorSense</title>', html=False)
+        self.assertContains(response, 'workspace-sidebar')
+        self.assertContains(response, 'Cotton Poplin')
+        self.assertContains(response, '>1</strong>')
+
 # Create your tests here.

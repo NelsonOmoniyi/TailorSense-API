@@ -51,6 +51,8 @@ TailorSense/
 - `config` — central Django settings and root URL configuration.
 - `templates` — reusable Bootstrap layout and page templates.
 
+The authenticated workspace shell lives in `templates/base.html`. It owns the shared sidebar, search bar, notification menu, account menu, and responsive mobile navigation. Home content lives in `templates/home.html`; Fabrics, Measurements, Styles, and Recommendations each own a `dashboard.html` template in their respective template directories. Measurements, Styles, and Recommendations currently show empty states until their persistence models and APIs are implemented.
+
 ## Authentication pattern
 
 - Core renders the public and signed-in pages and handles browser forms.
@@ -66,7 +68,7 @@ TailorSense/
 - `GET /api/fabrics/list/` — returns the fabric catalog for an authenticated session.
 - `POST /api/fabrics/add/` — validates and creates a fabric.
 
-Core-rendered routes include `/`, `/login/`, `/register/`, `/home/`, and `/fabrics/`.
+Core-rendered routes include `/`, `/login/`, `/register/`, `/home/`, `/profile/`, `/measurements/`, `/fabrics/`, `/styles/`, `/recommendations/`, `/orders/`, and `/settings/`.
 For API request and response formats, refer to [API User Guide/API.md](API%20User%20Guide/API.md).
 
 ## Local setup
@@ -122,7 +124,13 @@ python manage.py runserver
 | `/login/` | Web login page |
 | `/register/` | Web registration page |
 | `/home/` | Signed-in home page |
+| `/profile/` | Account profile page |
+| `/measurements/` | Measurement workspace |
 | `/fabrics/` | Authenticated fabric dashboard |
+| `/styles/` | Style catalog workspace |
+| `/recommendations/` | Recommendation workspace |
+| `/orders/` | Order and activity history |
+| `/settings/` | Workspace settings |
 | `/api/users/register/` | User registration API |
 | `/api/users/login/` | User login API |
 | `/api/users/signout/` | User signout API |

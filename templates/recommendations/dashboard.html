@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Recommendations | TailorSense{% endblock %}
+
+{% block content %}
+{# Recommendations owns its results and filters; no sample recommendations are fabricated. #}
+<header class="workspace-page-heading">
+    <div>
+        <p class="workspace-page-kicker">PERSONALIZED IDEAS</p>
+        <h1>Recommendations</h1>
+        <p>Suggestions based on your profile and fabrics.</p>
+    </div>
+</header>
+
+<section class="workspace-panel catalog-empty-panel" aria-labelledby="recommendation-list-title">
+    <div class="workspace-panel-heading">
+        <div>
+            <h2 id="recommendation-list-title">Suggestions for you</h2>
+            <p>Style suggestions based on your measurements and fabrics.</p>
+        </div>
+        <span class="workspace-filter-label"><i class="bi bi-sliders" aria-hidden="true"></i> All</span>
+    </div>
+    <div class="workspace-empty-state">
+        <i class="bi bi-lightbulb" aria-hidden="true"></i>
+        <h2>Recommendations are not ready yet</h2>
+        <p>Add measurements and style preferences to prepare this section.</p>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'measurements' %}">Open measurements</a>
+    </div>
+</section>
+{% endblock %}

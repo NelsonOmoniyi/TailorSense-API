@@ -1,64 +1,166 @@
 {% extends 'base.html' %}
-
-{% block title %}Home | TailorSense{% endblock %}
+{% block title %}{% if page_title %}{{ page_title }}{% else %}Home{% endif %} | TailorSense{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm p-4 p-lg-5">
-                <p class="text-uppercase text-primary fw-semibold mb-2">Welcome back</p>
-                <h1 class="display-5 fw-bold mb-3">{{ request.user.first_name|default:request.user.username }}</h1>
-                <p class="lead text-muted mb-4">
-                    Your TailorSense workspace is ready. The home page is expanding with more tools soon, but the fabric catalog is already available for your next design decision.
-                </p>
+{% if section %}
+<header class="workspace-page-heading">
+    <div>
+        <p class="workspace-page-kicker">TAILORSENSE HOME</p>
+        <h1>{{ page_title }}</h1>
+        <p>{{ page_description }}</p>
+    </div>
+</header>
 
-                <div class="d-flex flex-wrap gap-3">
-                    <a href="{% url 'fabrics-dashboard' %}" class="btn btn-primary btn-lg">Open Fabric Dashboard</a>
+{# Each route selects one clearly commented Home section; shared navigation still comes from base.html. #}
+{% if section == 'profile' %}
+    {# Account identity is real Django user data; phone is read from the optional user profile. #}
+    <div class="profile-page-grid">
+        <section class="workspace-panel profile-information-panel" aria-labelledby="profile-information-title">
+            <div class="workspace-panel-heading"><h2 id="profile-information-title">Profile information</h2></div>
+            <div class="profile-summary">
+                <span class="profile-large-avatar" aria-hidden="true">{{ request.user.first_name|default:request.user.username|slice:':1'|upper }}</span>
+                <div class="profile-fields">
+                    <div class="profile-field"><span>Full name</span><strong>{{ request.user.first_name|default:request.user.username }}</strong></div>
+                    <div class="profile-field"><span>Email address</span><strong>{{ request.user.email|default:'Not provided' }}</strong></div>
+                    <div class="profile-field"><span>Phone number</span><strong>{{ profile_phone|default:'Not provided' }}</strong></div>
+                    <div class="profile-field"><span>Account</span><strong class="account-status"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Active</strong></div>
                 </div>
             </div>
+        </section>
+        <div class="profile-side-panels">
+            <section class="workspace-panel" aria-labelledby="about-profile-title">
+                <div class="workspace-panel-heading"><h2 id="about-profile-title">About me</h2></div>
+                <div class="workspace-empty-state compact-empty-state"><i class="bi bi-person-lines-fill" aria-hidden="true"></i><p>Your style bio hasn't been added yet.</p></div>
+            </section>
+            <section class="workspace-panel" aria-labelledby="profile-preferences-title">
+                <div class="workspace-panel-heading"><h2 id="profile-preferences-title">Preferences</h2></div>
+                <dl class="preference-list mb-0">
+                    <div><dt>Preferred fit</dt><dd>Not set</dd></div>
+                    <div><dt>Style preference</dt><dd>Not set</dd></div>
+                    <div><dt>Theme</dt><dd>Light</dd></div>
+                </dl>
+            </section>
+        </div>
+    </div>
+{% elif section == 'orders' %}
+    {# Preserve the order-history layout while keeping its empty state explicit. #}
+    <section class="workspace-panel orders-panel" aria-labelledby="orders-table-title">
+        <div class="workspace-panel-heading"><div><h2 id="orders-table-title">Orders / History</h2><p>Track tailoring orders and generated styles.</p></div></div>
+        <div class="orders-filters" role="group" aria-label="Order status filters"><button type="button" class="orders-filter is-selected">All</button><button type="button" class="orders-filter" disabled>Completed</button><button type="button" class="orders-filter" disabled>Processing</button><button type="button" class="orders-filter" disabled>Cancelled</button></div>
+        <div class="table-responsive"><table class="table workspace-table align-middle mb-0"><thead><tr><th>Order</th><th>Date</th><th>Type</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody><tr><td colspan="6"><div class="table-empty-state"><i class="bi bi-clock-history" aria-hidden="true"></i><strong>No orders yet</strong><span>Your completed activity will appear here.</span></div></td></tr></tbody></table></div>
+    </section>
+{% elif section == 'settings' %}
+    {# Settings are informational until user preferences are persisted by a settings model. #}
+    <div class="settings-grid">
+        <section class="workspace-panel settings-panel" aria-labelledby="appearance-title"><div class="settings-panel-icon"><i class="bi bi-palette" aria-hidden="true"></i></div><h2 id="appearance-title">Appearance</h2><p>Choose how TailorSense looks on your device.</p><label for="theme-preview" class="form-label">Theme</label><select id="theme-preview" class="form-select" disabled><option>Light</option><option>Dark</option></select><small class="settings-note">Theme preferences are not saved yet.</small></section>
+        <section class="workspace-panel settings-panel" aria-labelledby="notifications-title"><div class="settings-panel-icon settings-panel-icon-blue"><i class="bi bi-bell" aria-hidden="true"></i></div><h2 id="notifications-title">Notifications</h2><p>Manage updates about your TailorSense activity.</p><div class="settings-option"><span>Style recommendations</span><span class="settings-state">Off</span></div><div class="settings-option"><span>Order updates</span><span class="settings-state">Off</span></div><div class="settings-option"><span>New fabrics</span><span class="settings-state">Off</span></div></section>
+        <section class="workspace-panel settings-panel" aria-labelledby="system-title"><div class="settings-panel-icon settings-panel-icon-red"><i class="bi bi-sliders" aria-hidden="true"></i></div><h2 id="system-title">System</h2><p>Account and data tools.</p><a class="settings-system-link" href="{% url 'profile' %}"><i class="bi bi-person" aria-hidden="true"></i>Account profile</a></section>
+    </div>
+{% endif %}
+{% else %}
+{# Home is the landing page inside the authenticated app; feature routes render their own section below. #}
+<header class="workspace-page-heading">
+    <div>
+        <h1>Home</h1>
+        <p>Your measurements, fabrics, and tailoring activity at a glance.</p>
+    </div>
+</header>
+
+{# The welcome banner is the dashboard's visual anchor; the photo is an existing TailorSense asset. #}
+<section class="dashboard-welcome" aria-labelledby="welcome-title">
+    <div class="dashboard-welcome-copy">
+        <p class="dashboard-eyebrow">YOUR TAILORSENSE WORKSPACE</p>
+        <h2 id="welcome-title">Welcome back, {{ request.user.first_name|default:request.user.username }}.</h2>
+        <p>Pick up where you left off and explore the fabric catalog for your next project.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary btn-sm" href="{% url 'recommendations' %}"><i class="bi bi-stars me-2" aria-hidden="true"></i>Get style recommendations</a>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'fabrics-dashboard' %}"><i class="bi bi-layers me-2" aria-hidden="true"></i>Explore fabrics</a>
+        </div>
+    </div>
+    <div class="dashboard-welcome-photo" role="img" aria-label="Tailoring studio with garments and fabric"></div>
+</section>
+
+{# Counts intentionally come from implemented APIs/models; unsupported features display zero, not demo data. #}
+<section class="dashboard-stat-grid" aria-label="Workspace totals">
+    <a class="dashboard-stat" href="{% url 'measurements' %}">
+        <span class="dashboard-stat-icon stat-icon-mint"><i class="bi bi-rulers" aria-hidden="true"></i></span>
+        <span class="dashboard-stat-copy"><small>Saved measurements</small><strong>0</strong><span>View measurements <i class="bi bi-arrow-right" aria-hidden="true"></i></span></span>
+    </a>
+    <a class="dashboard-stat" href="{% url 'fabrics-dashboard' %}">
+        <span class="dashboard-stat-icon stat-icon-blue"><i class="bi bi-layers" aria-hidden="true"></i></span>
+        <span class="dashboard-stat-copy"><small>Available fabrics</small><strong>{{ fabric_count }}</strong><span>Browse catalog <i class="bi bi-arrow-right" aria-hidden="true"></i></span></span>
+    </a>
+    <a class="dashboard-stat" href="{% url 'styles' %}">
+        <span class="dashboard-stat-icon stat-icon-violet"><i class="bi bi-stars" aria-hidden="true"></i></span>
+        <span class="dashboard-stat-copy"><small>Generated styles</small><strong>0</strong><span>Explore styles <i class="bi bi-arrow-right" aria-hidden="true"></i></span></span>
+    </a>
+    <a class="dashboard-stat" href="{% url 'orders' %}">
+        <span class="dashboard-stat-icon stat-icon-amber"><i class="bi bi-bag-check" aria-hidden="true"></i></span>
+        <span class="dashboard-stat-copy"><small>Past orders</small><strong>0</strong><span>View history <i class="bi bi-arrow-right" aria-hidden="true"></i></span></span>
+    </a>
+</section>
+
+<div class="dashboard-content-grid">
+    <section class="workspace-panel quick-actions-panel" aria-labelledby="quick-actions-title">
+        <div class="workspace-panel-heading">
+            <h2 id="quick-actions-title">Quick actions</h2>
+        </div>
+        <div class="quick-action-list">
+            <a class="quick-action" href="{% url 'measurements' %}">
+                <span class="quick-action-icon stat-icon-mint"><i class="bi bi-rulers" aria-hidden="true"></i></span>
+                <span><strong>Add new measurements</strong><small>Save a measurement set</small></span>
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+            <a class="quick-action" href="{% url 'fabrics-dashboard' %}">
+                <span class="quick-action-icon stat-icon-blue"><i class="bi bi-layers" aria-hidden="true"></i></span>
+                <span><strong>Browse fabrics</strong><small>Explore the catalog</small></span>
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+            <a class="quick-action" href="{% url 'styles' %}">
+                <span class="quick-action-icon stat-icon-violet"><i class="bi bi-stars" aria-hidden="true"></i></span>
+                <span><strong>Explore styles</strong><small>Browse clothing styles</small></span>
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </section>
+
+    <section class="workspace-panel recent-fabrics-panel" aria-labelledby="recent-fabrics-title">
+        <div class="workspace-panel-heading">
+            <div><h2 id="recent-fabrics-title">Fabric catalog</h2><p>Available materials</p></div>
+            <a href="{% url 'fabrics-dashboard' %}" class="workspace-text-link">View all <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
         </div>
 
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="h4 fw-bold mb-3">Fabric catalog snapshot</h2>
-
-                    {% if error %}
-                        <div class="alert alert-warning mb-0" role="alert">
-                            {{ error }}
-                        </div>
-                    {% elif fabrics %}
-                        <div class="list-group list-group-flush">
-                            {% for fabric in fabrics|slice:':3' %}
-                                <div class="list-group-item px-0 py-3">
-                                    <div class="d-flex justify-content-between align-items-center gap-3">
-                                        <span class="fw-semibold">{{ fabric.fabric_name }}</span>
-                                        <span class="badge bg-success-subtle text-success-emphasis">{{ fabric.fiber_category|default:'Fabric' }}</span>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info mb-0" role="alert">
-                            No fabrics are available yet.
-                        </div>
-                    {% endif %}
-                </div>
+        {% if error %}
+            <div class="alert alert-warning mb-0" role="alert">{{ error }}</div>
+        {% elif fabrics %}
+            <div class="recent-fabric-list">
+                {% for fabric in fabrics|slice:':4' %}
+                    <a class="recent-fabric-row" href="{% url 'fabrics-dashboard' %}">
+                        <span class="fabric-swatch" aria-hidden="true"><i class="bi bi-layers"></i></span>
+                        <span class="recent-fabric-copy"><strong>{{ fabric.fabric_name }}</strong><small>{{ fabric.composition }}</small></span>
+                        <span class="fabric-category-badge">{{ fabric.fiber_category|default:'Fabric' }}</span>
+                    </a>
+                {% endfor %}
             </div>
+        {% else %}
+            <div class="workspace-empty-state compact-empty-state">
+                <i class="bi bi-layers" aria-hidden="true"></i>
+                <p>No fabrics are available yet.</p>
+                <a href="{% url 'fabrics-dashboard' %}">Open fabric catalog</a>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="workspace-panel dashboard-recommendations-panel" aria-labelledby="recommendations-title">
+        <div class="workspace-panel-heading">
+            <div><h2 id="recommendations-title">Recommended for you</h2><p>Personalized style ideas</p></div>
+            <a href="{% url 'recommendations' %}" class="workspace-text-link">View all <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="workspace-empty-state compact-empty-state">
+            <i class="bi bi-lightbulb" aria-hidden="true"></i>
+            <p>Recommendations will appear when your style profile is ready.</p>
+            <a href="{% url 'profile' %}">View your profile</a>
         </div>
     </div>
-</div>
-
-<footer class="border-top bg-white mt-5 py-4">
-    <div class="container d-flex justify-content-center">
-        <form action="{% url 'signout' %}" method="post" class="m-0">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-dark">Sign Out</button>
-        </form>
-    </div>
-</footer>
+{% endif %}
 {% endblock %}

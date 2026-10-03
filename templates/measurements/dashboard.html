@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Measurements | TailorSense{% endblock %}
+
+{% block content %}
+{# This dashboard owns measurement-specific presentation; records will come from the Measurements app model. #}
+<header class="workspace-page-heading">
+	<div>
+		<p class="workspace-page-kicker">MEASUREMENTS</p>
+		<h1>Measurements</h1>
+		<p>Your saved measurement sets.</p>
+	</div>
+</header>
+
+<div class="measurement-workspace-grid">
+	<section class="workspace-panel measurement-sets-panel" aria-labelledby="measurement-sets-title">
+		<div class="workspace-panel-heading">
+			<h2 id="measurement-sets-title">My measurements</h2>
+			<span class="workspace-count">0 saved</span>
+		</div>
+		<div class="workspace-empty-state">
+			<i class="bi bi-rulers" aria-hidden="true"></i>
+			<h2>No measurement sets yet</h2>
+			<p>Your saved measurement profiles will appear here.</p>
+		</div>
+	</section>
+	<aside class="workspace-panel measurement-guide-panel" aria-labelledby="measurement-guide-title">
+		<h2 id="measurement-guide-title">Measurement guide</h2>
+		<div class="measurement-guide-icon"><i class="bi bi-person-standing" aria-hidden="true"></i></div>
+		<p>Accurate measurements help your tailor create a better fit.</p>
+		<ul>
+			<li>Use a flexible measuring tape</li>
+			<li>Keep the tape level and comfortably snug</li>
+			<li>Record measurements in centimeters</li>
+		</ul>
+	</aside>
+</div>
+{% endblock %}

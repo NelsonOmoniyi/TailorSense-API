@@ -1,9 +1,17 @@
-"""Views for the public landing page and signed-in dashboard shell."""
+"""HTTP views for public pages and the authenticated TailorSense interface.
+
+Core owns browser-facing HTML, form handling, navigation, and user feedback.
+Domain APIs remain the source of truth for account and fabric operations; the
+views here translate between browser requests and those API contracts. This
+keeps templates presentation-focused and prevents the UI from duplicating API
+validation or persistence rules.
+"""
 
 import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
@@ -11,11 +19,17 @@ from apps.users.auth import authenticated_required, get_authenticated_user
 
 
 def landing(request):
-    # Public page for visitors.
+    """Render the public entry page without loading authenticated workspace data."""
     return render(request, 'landing.html')
 
 
 def _api_error_message(response, fallback):
+    """Turn DRF's field/detail error payload into a message suitable for HTML.
+
+    API clients receive structured JSON errors. Browser forms instead display a
+    concise message near the form, so this adapter preserves useful validation
+    details while tolerating non-JSON responses from unavailable services.
+    """
     try:
         payload = response.json()
     except ValueError:
@@ -38,11 +52,24 @@ def _api_error_message(response, fallback):
 
 
 def _api_headers(request):
+    """Forward the browser CSRF token when core makes a session-authenticated API call.
+
+    The API request is issued server-side, but it represents a browser form
+    submission. Passing the submitted browser token lets DRF apply the same
+    CSRF protection it uses for direct session-authenticated requests.
+    """
     csrf_token = request.COOKIES.get(settings.CSRF_COOKIE_NAME)
     return {'X-CSRFToken': csrf_token} if csrf_token else {}
 
 
 def _copy_api_cookies(api_response, response):
+    """Relay authentication cookies from the login API to the user's browser.
+
+    The API establishes the Django session; without copying its Set-Cookie
+    values onto core's redirect, the browser would not be authenticated on the
+    next page. Cookie security attributes come from Django settings so this
+    proxy does not weaken the project's session or CSRF policy.
+    """
     for name, value in api_response.cookies.items():
         is_session = name == settings.SESSION_COOKIE_NAME
         response.set_cookie(
@@ -55,6 +82,12 @@ def _copy_api_cookies(api_response, response):
 
 
 def register(request):
+    """Render registration UI and delegate account creation to the user API.
+
+    Core deliberately does not create users itself. The API owns field and
+    password validation plus persistence; core only forwards submitted form
+    data and converts the API result into a redirect or an inline form error.
+    """
     error = None
     if request.method == 'POST':
         try:
@@ -76,6 +109,12 @@ def register(request):
 
 
 def login(request):
+    """Render sign-in UI and establish the browser session through the user API.
+
+    On success, the API's session cookie must be relayed before redirecting to
+    Home. Invalid credentials and temporary API failures stay on the sign-in
+    page so users can retry without losing their form context.
+    """
     error = None
     if request.method == 'POST':
         try:
@@ -101,9 +140,10 @@ def login(request):
 def _fetch_fabrics_from_api(request):
     """Fetch the authenticated fabric list through the shared session auth gate.
 
-    The project does not silently fall back to an empty list when the API fails;
-    the caller handles the error and tells the user clearly that the catalog is
-    temporarily unavailable.
+    The browser's session cookie is forwarded to the fabric API, which remains
+    responsible for authentication and catalog data. Returning an explicit
+    error separately from the records is important: an API outage must not look
+    like a valid but empty catalog in Home or Fabrics.
     """
     user = get_authenticated_user(request)
     if user is None:
@@ -121,24 +161,117 @@ def _fetch_fabrics_from_api(request):
         return {'error': 'We could not load the fabric catalog at this time. Please try again shortly.'}, None
 
 
-# Private page for logged-in users.
 @authenticated_required
 def home(request):
+    """Build the Home overview from the authenticated fabric API response.
+
+    The count and preview use the same response that powers the catalog. Other
+    dashboard counts remain zero until their corresponding domain models and
+    APIs exist, rather than implying that sample records are persisted.
+    """
     error, fabrics = _fetch_fabrics_from_api(request)
-    return render(request, 'home.html', {'fabrics': fabrics, 'error': error})
+    return render(request, 'home.html', {
+        'fabrics': fabrics,
+        'fabric_count': len(fabrics or []),
+        'error': error,
+    })
+
+
+@authenticated_required
+def home_section(request, section):
+    """Render account, history, or settings content embedded in Home.
+
+    These sections currently share ``home.html`` because they are small
+    account-level views rather than separate data-owning applications. The
+    ``section`` key selects one conditional block; Measurements, Fabrics,
+    Styles, and Recommendations are routed to their own dashboard templates
+    below instead of being mixed into Home.
+    """
+    pages = {
+        'profile': ('My Profile', 'Your account details and style preferences.'),
+        'orders': ('Orders / History', 'Your tailoring and style activity.'),
+        'settings': ('Settings', 'Your application preferences.'),
+    }
+    title, description = pages[section]
+    try:
+        # Older accounts may not have a profile row, so profile display must remain optional.
+        phone = request.user.profile.phone
+    except ObjectDoesNotExist:
+        phone = ''
+
+    return render(request, 'home.html', {
+        'section': section,
+        'page_title': title,
+        'page_description': description,
+        'profile_phone': phone,
+    })
+
+
+@authenticated_required
+def measurements_dashboard(request):
+    """Render Measurements UI from its own template under the shared base shell.
+
+    The Measurements persistence/API layer is not present yet. Keeping its
+    dashboard in its own template gives that app a clear extension point
+    without coupling its page markup to Home.
+    """
+    return render(request, 'measurements/dashboard.html')
+
+
+@authenticated_required
+def styles_dashboard(request):
+    """Render Styles UI from its own template under the shared base shell.
+
+    Style records and filters will be supplied by the Styles domain when it is
+    implemented; this view intentionally does not manufacture catalog data.
+    """
+    return render(request, 'styles/dashboard.html')
+
+
+@authenticated_required
+def recommendations_dashboard(request):
+    """Render Recommendations UI from its own template under the shared base shell.
+
+    The future recommendation service can populate this page without moving
+    presentation back into Home or changing the shared navigation contract.
+    """
+    return render(request, 'recommendations/dashboard.html')
 
 
 @authenticated_required
 def fabric_dashboard(request):
-    """Render the fabric catalogue from the fabrics API response."""
+    """Render the Fabrics app dashboard using API-owned catalog records.
+
+    Search is applied to the returned representation in core because the
+    current catalog API exposes a complete authenticated list. If filtering
+    later moves into the API, this view can pass the query through without
+    changing the template's ownership or the shared base shell.
+    """
     error, fabrics = _fetch_fabrics_from_api(request)
-    return render(request, 'fabrics/dashboard.html', {'fabrics': fabrics, 'error': error})
+    query = request.GET.get('q', '').strip()
+    if fabrics and query:
+        normalized_query = query.casefold()
+        searchable_fields = ('fabric_name', 'fiber_category', 'fiber', 'fabric_type', 'composition')
+        fabrics = [
+            fabric for fabric in fabrics
+            if any(normalized_query in str(fabric.get(field, '')).casefold() for field in searchable_fields)
+        ]
+    return render(request, 'fabrics/dashboard.html', {
+        'fabrics': fabrics,
+        'error': error,
+        'query': query,
+    })
 
 
 @authenticated_required
 @require_POST
 def add_fabric(request):
-    """Pass the catalogue form to the fabrics API, which owns fabric creation."""
+    """Relay the catalog form to the fabric API and translate its result for HTML.
+
+    The API is the only layer that validates and persists a Fabric. This view
+    forwards the session and CSRF token, then uses Django messages plus a
+    redirect so a browser refresh cannot submit the same form twice.
+    """
     api_url = request.build_absolute_uri('/api/fabrics/add/')
     csrf_token = request.COOKIES.get('csrftoken')
     headers = {'X-CSRFToken': csrf_token} if csrf_token else {}
@@ -155,6 +288,8 @@ def add_fabric(request):
         messages.error(request, 'We could not add the fabric at this time. Please try again shortly.')
         return redirect('fabrics-dashboard')
 
+    # API success and validation/authentication failures each map to a clear
+    # browser outcome; unexpected statuses use the common service-unavailable message.
     if response.status_code == 201:
         messages.success(request, 'Fabric added to the catalogue.')
         return redirect('fabrics-dashboard')
@@ -180,7 +315,13 @@ def add_fabric(request):
 
 
 def signout(request):
-    """Call the account API, clear the browser session, and return to the landing page."""
+    """Ask the user API to sign out, then always clear this browser's local session.
+
+    The POST-only browser action shares the user API's logout path. Local logout
+    still runs if that HTTP request fails, so a transient API outage cannot
+    leave the current browser signed in. A GET is treated as navigation back to
+    Home rather than as a state-changing operation.
+    """
     if request.method == 'POST':
         try:
             requests.post(

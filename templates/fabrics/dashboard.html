@@ -58,6 +58,12 @@
                 </div>
             {% endfor %}
         </div>
+    {% elif query %}
+        <div class="border rounded bg-white text-center px-3 py-5" role="status">
+            <h2 class="h5 mb-2">No fabrics match that search</h2>
+            <p class="text-muted mb-3">Try a different fabric name, fiber, or category.</p>
+            <a class="btn btn-outline-primary" href="{% url 'fabrics-dashboard' %}">Clear search</a>
+        </div>
     {% else %}
         <div class="border rounded bg-white text-center px-3 py-5" role="status">
             <h2 class="h5 mb-2">No fabrics yet</h2>
