@@ -28,6 +28,7 @@ TailorSense/
 ├── apps/
 │   ├── core/                 # All rendered pages and browser form handling
 │   ├── fabrics/              # Fabric model and JSON API
+│   ├── measurements/         # Normalized measurement and garment requirement data
 │   └── users/                # Account profile and JSON API
 ├── config/                   # Django settings and project routing
 ├── templates/                # Shared and app-specific HTML templates
@@ -48,10 +49,13 @@ TailorSense/
 - `apps/core` — owns all HTML pages and browser-facing form handling, and calls the APIs.
 - `apps/users` — stores account profile data and provides registration, login, and signout APIs.
 - `apps/fabrics` — stores fabric inventory data and provides the fabric API.
+- `apps/measurements` — stores user measurement profiles, reusable measurement types, and garment-specific requirements.
 - `config` — central Django settings and root URL configuration.
 - `templates` — reusable Bootstrap layout and page templates.
 
-The authenticated workspace shell lives in `templates/base.html`. It owns the shared sidebar, search bar, notification menu, account menu, and responsive mobile navigation. Home content lives in `templates/home.html`; Fabrics, Measurements, Styles, and Recommendations each own a `dashboard.html` template in their respective template directories. Measurements, Styles, and Recommendations currently show empty states until their persistence models and APIs are implemented.
+The authenticated workspace shell lives in `templates/base.html`. It owns the shared sidebar, search bar, notification menu, account menu, and responsive mobile navigation. Home content lives in `templates/home.html`; Fabrics, Measurements, Styles, and Recommendations each own a `dashboard.html` template in their respective template directories. The Measurements database is defined in `apps/measurements`; Styles and Recommendations currently show empty states until their persistence models and APIs are implemented.
+
+The Measurements schema stores one row per profile/type pair instead of adding a column for every body measurement. Garments declare required or optional types through a join table. Migrations seed reusable measurement types plus Men's Kaftan and Women's Bubu Gown requirements supplied in the schema briefs.
 
 ## Authentication pattern
 
@@ -67,6 +71,9 @@ The authenticated workspace shell lives in `templates/base.html`. It owns the sh
 - `POST /api/users/signout/` — ends the authenticated Django session.
 - `GET /api/fabrics/list/` — returns the fabric catalog for an authenticated session.
 - `POST /api/fabrics/add/` — validates and creates a fabric.
+- `GET /api/measurements/types/` — returns available measurement types and stable codes.
+- `GET /api/measurements/profiles/` — returns the signed-in user's profiles and saved values.
+- `POST /api/measurements/profiles/` — atomically creates a profile with its measurement rows.
 
 Core-rendered routes include `/`, `/login/`, `/register/`, `/home/`, `/profile/`, `/measurements/`, `/fabrics/`, `/styles/`, `/recommendations/`, `/orders/`, and `/settings/`.
 For API request and response formats, refer to [API User Guide/API.md](API%20User%20Guide/API.md).

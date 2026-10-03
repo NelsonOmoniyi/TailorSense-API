@@ -3,26 +3,67 @@
 {% block title %}Measurements | TailorSense{% endblock %}
 
 {% block content %}
-{# This dashboard owns measurement-specific presentation; records will come from the Measurements app model. #}
 <header class="workspace-page-heading">
 	<div>
 		<p class="workspace-page-kicker">MEASUREMENTS</p>
 		<h1>Measurements</h1>
-		<p>Your saved measurement sets.</p>
+		<p>Saved profiles and their measurements.</p>
 	</div>
+	<button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addMeasurementProfileModal">
+		<i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add profile
+	</button>
 </header>
+
+{% if messages %}
+	{% for message in messages %}
+		<div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">{{ message }}</div>
+	{% endfor %}
+{% endif %}
+
+{% if error %}
+	<div class="alert alert-warning" role="alert">{{ error.error }}</div>
+{% endif %}
 
 <div class="measurement-workspace-grid">
 	<section class="workspace-panel measurement-sets-panel" aria-labelledby="measurement-sets-title">
 		<div class="workspace-panel-heading">
 			<h2 id="measurement-sets-title">My measurements</h2>
-			<span class="workspace-count">0 saved</span>
+			<span class="workspace-count">{{ profiles|length }} saved</span>
 		</div>
-		<div class="workspace-empty-state">
-			<i class="bi bi-rulers" aria-hidden="true"></i>
-			<h2>No measurement sets yet</h2>
-			<p>Your saved measurement profiles will appear here.</p>
-		</div>
+		{% if profiles %}
+			<div class="measurement-profile-list">
+				{% for profile in profiles %}
+					<article class="measurement-profile-card">
+						<header class="measurement-profile-header">
+							<div>
+								<h3>{{ profile.name }}</h3>
+								<p>{{ profile.gender|default:'Gender not specified'|title }} <span aria-hidden="true">&middot;</span> {{ profile.unit }}</p>
+							</div>
+							<span class="measurement-row-count">{{ profile.measurements|length }} values</span>
+						</header>
+						{% if profile.measurements %}
+							<dl class="measurement-value-grid">
+								{% for measurement in profile.measurements %}
+									<div>
+										<dt>{{ measurement.measurement_type.name }}</dt>
+										<dd>{{ measurement.value }} <span>{{ measurement.unit }}</span></dd>
+									</div>
+								{% endfor %}
+							</dl>
+						{% else %}
+							<p class="measurement-profile-empty">No values are saved in this profile.</p>
+						{% endif %}
+					</article>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="workspace-empty-state">
+				<i class="bi bi-rulers" aria-hidden="true"></i>
+				<h2>No measurement profiles yet</h2>
+				<p>Add a profile to start saving body measurements.</p>
+				<button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addMeasurementProfileModal">Add first profile</button>
+			</div>
+		{% endif %}
 	</section>
 	<aside class="workspace-panel measurement-guide-panel" aria-labelledby="measurement-guide-title">
 		<h2 id="measurement-guide-title">Measurement guide</h2>
@@ -35,4 +76,74 @@
 		</ul>
 	</aside>
 </div>
+
+{# One form submits a profile plus its nonblank values; core converts these repeated HTML fields to the API's nested JSON shape. #}
+<div class="modal fade" id="addMeasurementProfileModal" tabindex="-1" aria-labelledby="addMeasurementProfileTitle" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content">
+			<form action="{% url 'measurements-add-profile' %}" method="post">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h2 class="modal-title fs-5" id="addMeasurementProfileTitle">Add measurement profile</h2>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body measurement-profile-form-body">
+					<div class="row g-3 mb-4">
+						<div class="col-12 col-sm-6">
+							<label class="form-label" for="profile-name">Profile name</label>
+							<input class="form-control" id="profile-name" name="name" maxlength="100" required>
+						</div>
+						<div class="col-12 col-sm-3">
+							<label class="form-label" for="profile-gender">Gender</label>
+							<select class="form-select" id="profile-gender" name="gender">
+								<option value="">Not specified</option><option value="female">Female</option><option value="male">Male</option><option value="other">Other</option>
+							</select>
+						</div>
+						<div class="col-12 col-sm-3">
+							<label class="form-label" for="profile-unit">Unit</label>
+							<select class="form-select" id="profile-unit" name="unit" required>
+								<option value="cm">Centimeters</option><option value="in">Inches</option>
+							</select>
+						</div>
+					</div>
+
+					<h3 class="measurement-form-section-title">Measurement values</h3>
+					<p class="measurement-form-note">Enter at least one value. Lengths use the selected profile unit; weight uses its listed unit.</p>
+					{% if measurement_types %}
+						<div class="measurement-entry-grid">
+							{% for measurement_type in measurement_types %}
+								<div class="measurement-entry">
+									<div class="measurement-entry-label">
+										<label for="measurement-{{ measurement_type.code }}">{{ measurement_type.name }}</label>
+										<!-- {% if measurement_type.is_core %}<span>Core</span>{% endif %} -->
+									</div>
+									<input type="hidden" name="measurement_type_code" value="{{ measurement_type.code }}">
+									<div class="input-group input-group-sm">
+										<input class="form-control" id="measurement-{{ measurement_type.code }}" name="measurement_value" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="{% if measurement_type.is_core %}Required{% else %}Optional{% endif %}">
+										<span class="input-group-text profile-unit-label" data-profile-unit="{% if measurement_type.unit == 'cm' or measurement_type.unit == 'in' %}true{% else %}false{% endif %}">{{ measurement_type.unit }}</span>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					{% else %}
+						<div class="alert alert-warning mb-0" role="alert">Measurement types could not be loaded.</div>
+					{% endif %}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-primary">Save profile</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Keep each row's unit suffix aligned with the profile-wide unit selection.
+	document.getElementById('profile-unit')?.addEventListener('change', (event) => {
+		document.querySelectorAll('.profile-unit-label[data-profile-unit="true"]').forEach((label) => {
+			label.textContent = event.target.value;
+		});
+	});
+</script>
 {% endblock %}

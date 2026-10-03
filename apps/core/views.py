@@ -161,6 +161,28 @@ def _fetch_fabrics_from_api(request):
         return {'error': 'We could not load the fabric catalog at this time. Please try again shortly.'}, None
 
 
+def _fetch_measurement_api(request, endpoint):
+    """Fetch one authenticated Measurements API resource for a core page.
+
+    The user's session cookie is forwarded to the API, which scopes profile
+    records to the authenticated account. API failures are returned separately
+    from data so an outage is never presented as an empty measurement history.
+    """
+    if get_authenticated_user(request) is None:
+        return {'error': 'Your session is no longer valid. Please sign in again.'}, None
+
+    api_url = request.build_absolute_uri(endpoint)
+    try:
+        response = requests.get(api_url, cookies=request.COOKIES, timeout=10)
+        if response.status_code == 200:
+            return None, response.json()
+        if response.status_code == 401:
+            return {'error': 'Your session is no longer valid. Please sign in again.'}, None
+        return {'error': 'The measurements service is temporarily unavailable. Please try again shortly.'}, None
+    except requests.RequestException:
+        return {'error': 'We could not load measurements at this time. Please try again shortly.'}, None
+
+
 @authenticated_required
 def home(request):
     """Build the Home overview from the authenticated fabric API response.
@@ -170,11 +192,15 @@ def home(request):
     APIs exist, rather than implying that sample records are persisted.
     """
     error, fabrics = _fetch_fabrics_from_api(request)
-    return render(request, 'home.html', {
-        'fabrics': fabrics,
-        'fabric_count': len(fabrics or []),
+    error, measurements = _fetch_measurement_api(request, '/api/measurements/profiles/')
+
+    data = {
+        'fabrics_count': len(fabrics or []),
+        'measurements_count': len(measurements or []),
         'error': error,
-    })
+    }
+    
+    return render(request, 'home.html', { 'data': data })
 
 
 @authenticated_required
@@ -209,13 +235,62 @@ def home_section(request, section):
 
 @authenticated_required
 def measurements_dashboard(request):
-    """Render Measurements UI from its own template under the shared base shell.
+    """Render the signed-in user's saved measurement profiles and type catalog."""
+    types_error, measurement_types = _fetch_measurement_api(request, '/api/measurements/types/')
+    profiles_error, profiles = _fetch_measurement_api(request, '/api/measurements/profiles/')
+    return render(request, 'measurements/dashboard.html', {
+        'measurement_types': measurement_types or [],
+        'profiles': profiles or [],
+        'error': types_error or profiles_error,
+    })
 
-    The Measurements persistence/API layer is not present yet. Keeping its
-    dashboard in its own template gives that app a clear extension point
-    without coupling its page markup to Home.
+
+@authenticated_required
+@require_POST
+def add_measurement_profile(request):
+    """Relay one profile and its nonblank measurement values to the API.
+
+    HTML submits parallel repeated fields for type codes and values. Core pairs
+    those fields, omits untouched inputs, and lets the API validate stable
+    codes, enforce ownership, and persist the profile and its rows atomically.
     """
-    return render(request, 'measurements/dashboard.html')
+    type_codes = request.POST.getlist('measurement_type_code')
+    values = request.POST.getlist('measurement_value')
+    measurement_entries = [
+        {'measurement_type': code, 'value': value}
+        for code, value in zip(type_codes, values)
+        if value.strip()
+    ]
+    payload = {
+        'name': request.POST.get('name', '').strip(),
+        'gender': request.POST.get('gender', '').strip(),
+        'unit': request.POST.get('unit', 'cm'),
+        'measurements': measurement_entries,
+    }
+
+    try:
+        response = requests.post(
+            request.build_absolute_uri('/api/measurements/profiles/'),
+            json=payload,
+            cookies=request.COOKIES,
+            headers=_api_headers(request),
+            timeout=10,
+        )
+    except requests.RequestException:
+        messages.error(request, 'We could not save this measurement profile. Please try again shortly.')
+        return redirect('measurements')
+
+    if response.status_code == 201:
+        messages.success(request, 'Measurement profile saved.')
+    elif response.status_code == 401:
+        messages.error(request, 'Your session is no longer valid. Please sign in again.')
+        return redirect('login')
+    elif response.status_code == 400:
+        messages.error(request, _api_error_message(response, 'Please review the measurement details.'))
+    else:
+        messages.error(request, 'The measurements service is temporarily unavailable. Please try again shortly.')
+
+    return redirect('measurements')
 
 
 @authenticated_required

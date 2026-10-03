@@ -23,5 +23,6 @@ urlpatterns = [
     path('', include('apps.core.urls')),
     path('api/users/', include('apps.users.urls')),
     path('api/fabrics/', include('apps.fabrics.api_urls')),
+    path('api/measurements/', include('apps.measurements.api_urls')),
 ]
 

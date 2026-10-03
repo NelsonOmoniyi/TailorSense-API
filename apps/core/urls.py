@@ -10,6 +10,7 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('profile/', views.home_section, {'section': 'profile'}, name='profile'),
     path('measurements/', views.measurements_dashboard, name='measurements'),
+    path('measurements/add/', views.add_measurement_profile, name='measurements-add-profile'),
     # Fabrics has a data-backed API; core renders its dashboard and relays add-form submissions.
     path('fabrics/', views.fabric_dashboard, name='fabrics-dashboard'),
     path('fabrics/add/', views.add_fabric, name='add-fabric'),

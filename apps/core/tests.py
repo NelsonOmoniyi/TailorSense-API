@@ -95,10 +95,19 @@ class HomeSectionTests(TestCase):
         session['user_phone'] = ''
         session.save()
 
-    def test_reference_sections_render_inside_shared_workspace_shell(self):
+    @patch('apps.core.views.requests.get')
+    def test_reference_sections_render_inside_shared_workspace_shell(self, mock_get):
+        def measurement_api_response(url, **kwargs):
+            if url.endswith('/types/'):
+                return SimpleNamespace(status_code=200, json=lambda: [
+                    {'name': 'Height', 'code': 'height', 'category': 'body', 'unit': 'cm', 'is_core': True},
+                ])
+            return SimpleNamespace(status_code=200, json=lambda: [])
+
+        mock_get.side_effect = measurement_api_response
         pages = [
             ('/profile/', 'Profile information', 'home.html'),
-            ('/measurements/', 'No measurement sets yet', 'measurements/dashboard.html'),
+            ('/measurements/', 'No measurement profiles yet', 'measurements/dashboard.html'),
             ('/styles/', 'No styles to show yet', 'styles/dashboard.html'),
             ('/recommendations/', 'Recommendations are not ready yet', 'recommendations/dashboard.html'),
             ('/orders/', 'No orders yet', 'home.html'),
@@ -129,5 +138,68 @@ class HomeSectionTests(TestCase):
         self.assertContains(response, 'workspace-sidebar')
         self.assertContains(response, 'Cotton Poplin')
         self.assertContains(response, '>1</strong>')
+
+
+class MeasurementsDashboardProxyTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='measurement-user', email='measurement@example.com', password='safe-password'
+        )
+        self.client.force_login(self.user)
+        session = self.client.session
+        session['session_key_hash'] = hash_session_key(session.session_key, self.user.email)
+        session['user_email'] = self.user.email
+        session['user_phone'] = ''
+        session.save()
+
+    @patch('apps.core.views.requests.get')
+    def test_measurements_dashboard_renders_profiles_returned_by_api(self, mock_get):
+        def api_response(url, **kwargs):
+            if url.endswith('/types/'):
+                return SimpleNamespace(status_code=200, json=lambda: [
+                    {'name': 'Height', 'code': 'height', 'category': 'body', 'unit': 'cm', 'is_core': True},
+                ])
+            return SimpleNamespace(status_code=200, json=lambda: [{
+                'id': 1,
+                'name': 'Everyday Measurements',
+                'gender': 'female',
+                'unit': 'cm',
+                'measurements': [{
+                    'measurement_type': {'name': 'Height', 'code': 'height'},
+                    'value': '165.00',
+                    'unit': 'cm',
+                }],
+            }])
+
+        mock_get.side_effect = api_response
+
+        response = self.client.get('/measurements/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Everyday Measurements')
+        self.assertContains(response, '165.00')
+        self.assertContains(response, 'Height')
+        self.assertEqual(mock_get.call_count, 2)
+
+    @patch('apps.core.views.requests.post')
+    def test_measurement_form_relays_profile_and_nonblank_rows_to_api(self, mock_post):
+        mock_post.return_value = SimpleNamespace(status_code=201)
+
+        response = self.client.post('/measurements/add/', {
+            'name': 'Everyday Measurements',
+            'gender': 'female',
+            'unit': 'cm',
+            'measurement_type_code': ['height', 'bust', 'waist'],
+            'measurement_value': ['165', '94', ''],
+        })
+
+        self.assertRedirects(response, '/measurements/')
+        self.assertEqual(
+            mock_post.call_args.kwargs['json']['measurements'],
+            [
+                {'measurement_type': 'height', 'value': '165', 'unit': 'cm'},
+                {'measurement_type': 'bust', 'value': '94', 'unit': 'cm'},
+            ],
+        )
 
 # Create your tests here.

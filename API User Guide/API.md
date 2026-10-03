@@ -19,7 +19,8 @@ The core app owns all server-rendered HTML and browser form handling. It delegat
 ### API authentication
 
 - Core passes the active session cookie when calling authenticated APIs.
-- Fabric list/add and signout require a valid authenticated Django session.
+- Fabric and measurement profile operations plus signout require a valid authenticated Django session.
+- Measurement type lookup requires an authenticated Django session so the dashboard uses the same access boundary.
 - Registration and login are public JSON API endpoints.
 
 ## Implemented endpoints
@@ -57,6 +58,31 @@ Login request fields: `email` and `password`.
 |---|---|---|---|
 | `GET` | `/api/fabrics/list/` | Session-authenticated user | Return all fabrics available in the system |
 | `POST` | `/api/fabrics/add/` | Session-authenticated user | Validate and create a fabric |
+
+### 5. Measurements API
+
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/api/measurements/types/` | Session-authenticated user | Return reusable measurement types and stable codes |
+| `GET` | `/api/measurements/profiles/` | Session-authenticated user | Return only the signed-in user's profiles and measurement rows |
+| `POST` | `/api/measurements/profiles/` | Session-authenticated user | Atomically create a profile and its measurement rows |
+
+Profile creation uses type codes, not database IDs:
+
+```json
+{
+  "name": "Everyday Measurements",
+  "gender": "female",
+  "unit": "cm",
+  "measurements": [
+    {"measurement_type": "height", "value": "165", "unit": "cm"},
+    {"measurement_type": "bust", "value": "94", "unit": "cm"},
+    {"measurement_type": "dress_length", "value": "140", "unit": "cm"}
+  ]
+}
+```
+
+The API creates the profile for the authenticated user and stores each entry as an individual `Measurement` row. Duplicate type codes in one profile are rejected. The Measurements dashboard obtains the type catalog and current user's profile list through these endpoints.
 
 ## How the fabric API is used
 

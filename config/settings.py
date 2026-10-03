@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.users',
     'apps.fabrics',
+    'apps.measurements',
 ]
 
 MIDDLEWARE = [
