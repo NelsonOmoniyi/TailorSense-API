@@ -3,15 +3,15 @@
 {% block title %}Fabrics Dashboard{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container py-4 py-lg-5">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
             <p class="text-uppercase text-muted fw-semibold mb-1">TailorSense</p>
-            <h1 class="mb-0">Fabrics Dashboard</h1>
+            <h1 class="h2 mb-0">Fabric catalog</h1>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'home' %}" class="btn btn-outline-dark">Back to Home</a>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFabricModal">
+        <div class="d-flex flex-column flex-sm-row gap-2">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Back to Home</a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFabricModal" aria-label="Add fabric">
                 Add Fabric
             </button>
         </div>
@@ -26,120 +26,141 @@
     {% endif %}
 
     {% if fabrics %}
-        <div class="row g-4">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
             {% for fabric in fabrics %}
-                <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ fabric.fiber_category|default:'Fabric' }}</span>
-                                <!-- <span class="fw-bold text-success">${{ fabric.price_per_meter }}</span> -->
+                <div class="col">
+                    <article class="card h-100 border shadow-sm">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <span class="badge text-bg-light border mb-2">{{ fabric.fiber_category|default:'Uncategorized' }}</span>
+                                <h2 class="h5 card-title mb-1">{{ fabric.fabric_name }}</h2>
+                                <p class="small text-muted mb-0">{{ fabric.fiber|default:'Fiber not specified' }} &middot; {{ fabric.fabric_type|default:'Type not specified' }}</p>
                             </div>
 
-                            <h5 class="card-title fw-bold mb-2">{{ fabric.fabric_name }}</h5>
-                            <p class="text-muted mb-3">{{ fabric.composition|default:'Composition not specified' }}</p>
-
-                            <ul class="list-group list-group-flush mb-3">
-                                <li class="list-group-item px-0">
-                                    <strong>Fabric Type:</strong> {{ fabric.fabric_type|default:'Not specified' }}
-                                </li>
-                                <li class="list-group-item px-0">
-                                    <strong>Weight:</strong> {{ fabric.weight }}
-                                </li>
-                                <li class="list-group-item px-0">
-                                    <strong>Construction:</strong> {{ fabric.construction }}
-                                </li>
-                                <li class="list-group-item px-0">
-                                    <strong>Structure:</strong> {{ fabric.structure|default:'Not listed' }}
-                                </li>
-                            </ul>
-
-                            <!-- <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Available</small>
-                                <button class="btn btn-primary btn-sm">View Details</button>
-                            </div> -->
+                            <dl class="row small mb-0 gy-2">
+                                <dt class="col-5 text-muted fw-normal">Composition</dt>
+                                <dd class="col-7 mb-0">{{ fabric.composition }}</dd>
+                                <dt class="col-5 text-muted fw-normal">Construction</dt>
+                                <dd class="col-7 mb-0">{{ fabric.construction }}</dd>
+                                <dt class="col-5 text-muted fw-normal">Weight</dt>
+                                <dd class="col-7 mb-0">{{ fabric.weight|title }}</dd>
+                                <dt class="col-5 text-muted fw-normal">Structure</dt>
+                                <dd class="col-7 mb-0">{{ fabric.structure }}</dd>
+                                <dt class="col-5 text-muted fw-normal">Stretch</dt>
+                                <dd class="col-7 mb-0">{{ fabric.stretch|title }}</dd>
+                                <dt class="col-5 text-muted fw-normal">Breathability</dt>
+                                <dd class="col-7 mb-0">{{ fabric.breathability|title }}</dd>
+                                <dt class="col-5 text-muted fw-normal">Opacity</dt>
+                                <dd class="col-7 mb-0">{{ fabric.opacity|title }}</dd>
+                            </dl>
                         </div>
-                    </div>
+                    </article>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <div class="alert alert-info" role="alert">
-            No fabrics are available in the catalog yet.
+        <div class="border rounded bg-white text-center px-3 py-5" role="status">
+            <h2 class="h5 mb-2">No fabrics yet</h2>
+            <p class="text-muted mb-3">Add a fabric to begin building the catalog.</p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFabricModal">
+                Add Fabric
+            </button>
         </div>
     {% endif %}
 </div>
 
 <div class="modal fade" id="addFabricModal" tabindex="-1" aria-labelledby="addFabricModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <form action="{% url 'add-fabric' %}" method="post">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="addFabricModalLabel">Add a Fabric</h2>
+                    <h2 class="modal-title fs-5" id="addFabricModalLabel">Add fabric</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="text-muted small">Enter the properties used to assess the fabric for tailoring recommendations.</p>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label" for="fabric_name">Fabric name</label>
-                            <input class="form-control" id="fabric_name" name="fabric_name" maxlength="150" required>
+                    <fieldset class="mb-4">
+                        <legend class="fs-6 fw-semibold mb-3">Fabric details</legend>
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="fabric_name">Fabric name</label>
+                                <input class="form-control" id="fabric_name" name="fabric_name" maxlength="150" required>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="fiber_category">Fiber category</label>
+                                <input class="form-control" id="fiber_category" name="fiber_category" maxlength="100" required>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="fiber">Fiber</label>
+                                <input class="form-control" id="fiber" name="fiber" maxlength="50" required>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="fabric_type">Fabric type</label>
+                                <input class="form-control" id="fabric_type" name="fabric_type" maxlength="100" required>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="composition">Composition</label>
+                                <input class="form-control" id="composition" name="composition" maxlength="200" required>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="construction">Construction</label>
+                                <input class="form-control" id="construction" name="construction" maxlength="100" required>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="structure">Structure</label>
+                                <input class="form-control" id="structure" name="structure" maxlength="20" required>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="fiber_category">Fiber category</label>
-                            <input class="form-control" id="fiber_category" name="fiber_category" maxlength="100" placeholder="Natural, synthetic, or blend" required>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend class="fs-6 fw-semibold mb-3">Properties</legend>
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="weight">Weight class</label>
+                                <select class="form-select" id="weight" name="weight" required>
+                                    <option value="" selected disabled>Select weight</option>
+                                    <option value="lightweight">Lightweight</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="heavy">Heavy</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="stretch">Stretch</label>
+                                <select class="form-select" id="stretch" name="stretch" required>
+                                    <option value="" selected disabled>Select level</option>
+                                    <option value="none">None</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="breathability">Breathability</label>
+                                <select class="form-select" id="breathability" name="breathability" required>
+                                    <option value="" selected disabled>Select level</option>
+                                    <option value="none">None</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="opacity">Opacity</label>
+                                <select class="form-select" id="opacity" name="opacity" required>
+                                    <option value="" selected disabled>Select level</option>
+                                    <option value="none">None</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="fiber">Fiber</label>
-                            <input class="form-control" id="fiber" name="fiber" maxlength="50" placeholder="Cotton" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="fabric_type">Fabric type</label>
-                            <input class="form-control" id="fabric_type" name="fabric_type" maxlength="100" placeholder="Poplin" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="composition">Composition</label>
-                            <input class="form-control" id="composition" name="composition" maxlength="200" placeholder="100% cotton" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="construction">Construction</label>
-                            <input class="form-control" id="construction" name="construction" maxlength="100" placeholder="Woven" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="weight">Weight</label>
-                            <input class="form-control" id="weight" name="weight" maxlength="100" placeholder="120 gsm" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="structure">Structure</label>
-                            <input class="form-control" id="structure" name="structure" maxlength="20" placeholder="Plain weave" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="stretch">Stretch</label>
-                            <select class="form-select" id="stretch" name="stretch" required>
-                                <option value="" selected disabled>Choose…</option>
-                                <option value="none">None</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="breathability">Breathability</label>
-                            <select class="form-select" id="breathability" name="breathability" required>
-                                <option value="" selected disabled>Choose…</option>
-                                <option value="none">None</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="opacity">Opacity</label>
-                            <select class="form-select" id="opacity" name="opacity" required>
-                                <option value="" selected disabled>Choose…</option>
-                                <option value="none">None</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
-                            </select>
-                        </div>
-                    </div>
+                    </fieldset>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Fabric</button>
+                    <button type="submit" class="btn btn-primary">Add fabric</button>
                 </div>
             </form>
         </div>
