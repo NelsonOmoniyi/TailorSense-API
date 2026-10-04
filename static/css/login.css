@@ -70,9 +70,9 @@
     min-height: 100vh;
 
     display: flex;
-    align-items: center;
+    align-items: flex-start;
 
-    padding: 60px 6%;
+    padding: 140px 6% 60px;
 
     box-sizing: border-box;
 
