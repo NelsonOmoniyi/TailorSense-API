@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
 from .auth import authenticated_required, get_authenticated_user, login_user
 from .serializers import LoginSerializer, RegistrationSerializer
 
@@ -17,7 +16,7 @@ def register(request):
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
     return Response(
-        {'id': user.pk, 'email': user.email, 'fullname': user.first_name},
+        {'id': user.pk, 'email': user.email, 'fullname': user.first_name, 'phone': user.phone},
         status=status.HTTP_201_CREATED,
     )
 
@@ -35,9 +34,11 @@ def login(request):
     )
     if user is None:
         return Response({'detail': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+    
     login_user(request, user)
-    return Response({'id': user.pk, 'email': user.email, 'fullname': user.first_name})
+    # print("User logged in:", user.email, "Session key:", request.session.session_key)
+    
+    return Response({'id': user.pk, 'email': user.email, 'fullname': user.first_name}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

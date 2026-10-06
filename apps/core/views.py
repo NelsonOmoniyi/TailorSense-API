@@ -15,6 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
+from apps import users
 from apps.users.auth import authenticated_required, get_authenticated_user
 
 
@@ -131,9 +132,10 @@ def login(request):
             if api_response.status_code == 200:
                 response = redirect('home')
                 _copy_api_cookies(api_response, response)
+                
                 return response
             error = _api_error_message(api_response, 'Invalid email or password.')
-
+   
     return render(request, 'login.html', {'error': error})
 
 

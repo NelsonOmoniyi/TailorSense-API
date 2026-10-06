@@ -78,7 +78,7 @@
 </div>
 
 {# One form submits a profile plus its nonblank values; core converts these repeated HTML fields to the API's nested JSON shape. #}
-<div class="modal fade" id="addMeasurementProfileModal" tabindex="-1" aria-labelledby="addMeasurementProfileTitle" aria-hidden="true">
+<div class="modal fade localScroll" id="addMeasurementProfileModal" tabindex="-1" aria-labelledby="addMeasurementProfileTitle" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 		<div class="modal-content">
 			<form action="{% url 'measurements-add-profile' %}" method="post">

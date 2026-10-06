@@ -41,8 +41,9 @@ class RegistrationSerializer(serializers.Serializer):
 			email=validated_data['email'],
 			first_name=validated_data['fullname'],
 			password=validated_data['password'],
+			phone=validated_data['phone']
 		)
-		UserProfile.objects.create(user=user, phone=validated_data['phone'])
+		UserProfile.objects.create(user=user)
 		return user
 
 
