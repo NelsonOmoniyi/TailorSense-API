@@ -15,8 +15,9 @@ def register(request):
     serializer = RegistrationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
+    # phone lives on UserProfile, not on the built-in User model.
     return Response(
-        {'id': user.pk, 'email': user.email, 'fullname': user.first_name, 'phone': user.phone},
+        {'id': user.pk, 'email': user.email, 'fullname': user.first_name, 'phone': user.profile.phone},
         status=status.HTTP_201_CREATED,
     )
 

@@ -17,6 +17,7 @@ from django.views.decorators.http import require_POST
 
 from apps import users
 from apps.users.auth import authenticated_required, get_authenticated_user
+from apps.users.models import UserProfile
 
 
 def landing(request):
@@ -221,17 +222,31 @@ def home_section(request, section):
         'settings': ('Settings', 'Your application preferences.'),
     }
     title, description = pages[section]
+
+    # The profile page hosts the Add-Bio modal, which posts here as ``desc``.
+    if section == 'profile' and request.method == 'POST':
+        bio_value = request.POST.get('desc', '').strip()[:350]
+        UserProfile.objects.update_or_create(
+            user=request.user,
+            defaults={'bio': bio_value},
+        )
+        messages.success(request, 'Your bio has been saved.')
+        return redirect('profile')
+
     try:
         # Older accounts may not have a profile row, so profile display must remain optional.
         phone = request.user.profile.phone
+        bio = request.user.profile.bio
     except ObjectDoesNotExist:
         phone = ''
+        bio = ''
 
     return render(request, 'home.html', {
         'section': section,
         'page_title': title,
         'page_description': description,
         'profile_phone': phone,
+        'profile_bio': bio,
     })
 
 

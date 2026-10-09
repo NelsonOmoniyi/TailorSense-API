@@ -29,19 +29,49 @@
         </section>
         <div class="profile-side-panels">
             <section class="workspace-panel" aria-labelledby="about-profile-title">
-                <div class="workspace-panel-heading"><h2 id="about-profile-title">About me</h2></div>
-                <div class="workspace-empty-state compact-empty-state"><i class="bi bi-person-lines-fill" aria-hidden="true"></i><p>Your style bio hasn't been added yet.</p></div>
-            </section>
-            <section class="workspace-panel" aria-labelledby="profile-preferences-title">
-                <div class="workspace-panel-heading"><h2 id="profile-preferences-title">Preferences</h2></div>
-                <dl class="preference-list mb-0">
-                    <div><dt>Preferred fit</dt><dd>Not set</dd></div>
-                    <div><dt>Style preference</dt><dd>Not set</dd></div>
-                    <div><dt>Theme</dt><dd>Light</dd></div>
-                </dl>
+                <div class="workspace-panel-heading">
+                    <h2 id="about-profile-title">About me</h2>
+                    <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addAboutMe">Add Bio</button>
+                </div>
+                
+                <div class="workspace-empty-state compact-empty-state">
+                    <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+                    {% if profile_bio %}<p class="profile-bio mb-0 ">{{ profile_bio }}</p>{% else %}<p>Your style bio hasn't been added yet.</p>
+                </div>{% endif %}
             </section>
         </div>
     </div>
+
+<!-- About Me Modal Starts-->
+
+<div class="modal fade localScroll" id="addAboutMe" tabindex="-1" aria-labelledby="addAboutMe" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="addAboutMeTitle">Add about me information</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body measurement-profile-form-body">
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-lg-12">
+                            <label class="form-label" for="description">About Me</label>
+                            <input class="form-control" id="description" name="desc" maxlength="350" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Description</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- About Me Modal Ends -->
+
 {% elif section == 'orders' %}
     {# Preserve the order-history layout while keeping its empty state explicit. #}
     <section class="workspace-panel orders-panel" aria-labelledby="orders-table-title">

@@ -36,14 +36,14 @@ class RegistrationSerializer(serializers.Serializer):
 		return attrs
 
 	def create(self, validated_data):
+		# User is Django's built-in model and has no phone field; phone lives on UserProfile.
 		user = User.objects.create_user(
 			username=validated_data['email'],
 			email=validated_data['email'],
 			first_name=validated_data['fullname'],
 			password=validated_data['password'],
-			phone=validated_data['phone']
 		)
-		UserProfile.objects.create(user=user)
+		UserProfile.objects.create(user=user, phone=validated_data['phone'])
 		return user
 
 

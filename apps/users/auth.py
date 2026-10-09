@@ -5,7 +5,7 @@ used for the web app and the API layer. This prevents duplicated login logic and
 keeps the session identity rules consistent across the application.
 """
 
-import hashlib, pprint
+import hashlib
 
 from django.contrib.auth import login as auth_login
 
