@@ -189,22 +189,11 @@ class MeasurementApiTests(TestCase):
             if item['is_required']
         }
         self.assertIn('height', required_codes)
-        self.assertIn('weight', required_codes)
+        self.assertNotIn('weight', required_codes)
 
-    def test_weight_type_and_saved_value_use_mass_units(self):
-        weight_type = MeasurementType.objects.get(code='weight')
-        response = self.client.post(
-            '/api/measurements/profiles/',
-            {
-                **self.payload,
-                'measurements': [{'measurement_type': 'weight', 'value': '68'}],
-            },
-            content_type='application/json',
-        )
-
-        self.assertEqual(response.status_code, 201)
-        measurement = Measurement.objects.get(measurement_type=weight_type)
-        self.assertEqual(measurement.unit, 'kg')
+    def test_weight_type_is_not_available(self):
+        """Weight is not a tailoring measurement, so the type must not exist."""
+        self.assertFalse(MeasurementType.objects.filter(code='weight').exists())
 
     def test_profile_api_rejects_duplicate_measurement_types(self):
         payload = {

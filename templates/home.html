@@ -2,6 +2,11 @@
 {% block title %}{% if page_title %}{{ page_title }}{% else %}Home{% endif %} | TailorSense{% endblock %}
 
 {% block content %}
+<!-- Home template. Renders one of two things, chosen by the view (apps/core/views.py):
+     - With section set (profile / orders / settings): an account-level page.
+     - Without it: the dashboard overview with counts and the fabric preview.
+     The profile section reads profile_phone and profile_bio from the view; both
+     come from apps.users.models.UserProfile, guarded for accounts with no row. -->
 {% if section %}
 <header class="workspace-page-heading">
     <div>
@@ -11,9 +16,9 @@
     </div>
 </header>
 
-{# Each route selects one clearly commented Home section; shared navigation still comes from base.html. #}
+<!-- Each route selects one Home section; shared navigation still comes from base.html. -->
 {% if section == 'profile' %}
-    {# Account identity is real Django user data; phone is read from the optional user profile. #}
+    <!-- Account identity is real Django user data; phone and bio come from the optional user profile. -->
     <div class="profile-page-grid">
         <section class="workspace-panel profile-information-panel" aria-labelledby="profile-information-title">
             <div class="workspace-panel-heading"><h2 id="profile-information-title">Profile information</h2></div>
@@ -31,13 +36,20 @@
             <section class="workspace-panel" aria-labelledby="about-profile-title">
                 <div class="workspace-panel-heading">
                     <h2 id="about-profile-title">About me</h2>
-                    <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addAboutMe">Add Bio</button>
+                    <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addAboutMe">{% if profile_bio %} Edit Bio {% else %} Add Bio {% endif %}</button>
                 </div>
-                
-                <div class="workspace-empty-state compact-empty-state">
-                    <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
-                    {% if profile_bio %}<p class="profile-bio mb-0 ">{{ profile_bio }}</p>{% else %}<p>Your style bio hasn't been added yet.</p>
-                </div>{% endif %}
+
+                {% if profile_bio %}
+                    <div class="workspace-empty-state compact-empty-state">
+                        <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+                        <p class="profile-bio mb-0">{{ profile_bio }}</p>
+                    </div>
+                {% else %}
+                    <div class="workspace-empty-state compact-empty-state">
+                        <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+                        <p>Your style bio hasn't been added yet.</p>
+                    </div>
+                {% endif %}
             </section>
         </div>
     </div>
@@ -73,14 +85,14 @@
 <!-- About Me Modal Ends -->
 
 {% elif section == 'orders' %}
-    {# Preserve the order-history layout while keeping its empty state explicit. #}
+    <!-- Preserve the order-history layout while keeping its empty state explicit. -->
     <section class="workspace-panel orders-panel" aria-labelledby="orders-table-title">
         <div class="workspace-panel-heading"><div><h2 id="orders-table-title">Orders / History</h2><p>Track tailoring orders and generated styles.</p></div></div>
         <div class="orders-filters" role="group" aria-label="Order status filters"><button type="button" class="orders-filter is-selected">All</button><button type="button" class="orders-filter" disabled>Completed</button><button type="button" class="orders-filter" disabled>Processing</button><button type="button" class="orders-filter" disabled>Cancelled</button></div>
         <div class="table-responsive"><table class="table workspace-table align-middle mb-0"><thead><tr><th>Order</th><th>Date</th><th>Type</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody><tr><td colspan="6"><div class="table-empty-state"><i class="bi bi-clock-history" aria-hidden="true"></i><strong>No orders yet</strong><span>Your completed activity will appear here.</span></div></td></tr></tbody></table></div>
     </section>
 {% elif section == 'settings' %}
-    {# Settings are informational until user preferences are persisted by a settings model. #}
+    <!-- Settings are informational until user preferences are persisted by a settings model. -->
     <div class="settings-grid">
         <section class="workspace-panel settings-panel" aria-labelledby="appearance-title"><div class="settings-panel-icon"><i class="bi bi-palette" aria-hidden="true"></i></div><h2 id="appearance-title">Appearance</h2><p>Choose how TailorSense looks on your device.</p><label for="theme-preview" class="form-label">Theme</label><select id="theme-preview" class="form-select" disabled><option>Light</option><option>Dark</option></select><small class="settings-note">Theme preferences are not saved yet.</small></section>
         <section class="workspace-panel settings-panel" aria-labelledby="notifications-title"><div class="settings-panel-icon settings-panel-icon-blue"><i class="bi bi-bell" aria-hidden="true"></i></div><h2 id="notifications-title">Notifications</h2><p>Manage updates about your TailorSense activity.</p><div class="settings-option"><span>Style recommendations</span><span class="settings-state">Off</span></div><div class="settings-option"><span>Order updates</span><span class="settings-state">Off</span></div><div class="settings-option"><span>New fabrics</span><span class="settings-state">Off</span></div></section>
@@ -88,7 +100,7 @@
     </div>
 {% endif %}
 {% else %}
-{# Home is the landing page inside the authenticated app; feature routes render their own section below. #}
+<!-- Home is the landing page inside the authenticated app; feature routes render their own section below. -->
 <header class="workspace-page-heading">
     <div>
         <h1>Home</h1>
@@ -96,7 +108,7 @@
     </div>
 </header>
 
-{# The welcome banner is the dashboard's visual anchor; the photo is an existing TailorSense asset. #}
+<!-- The welcome banner is the dashboard's visual anchor; the photo is an existing TailorSense asset. -->
 <section class="dashboard-welcome" aria-labelledby="welcome-title">
     <div class="dashboard-welcome-copy">
         <p class="dashboard-eyebrow">YOUR TAILORSENSE WORKSPACE</p>
@@ -110,7 +122,7 @@
     <div class="dashboard-welcome-photo" role="img" aria-label="Tailoring studio with garments and fabric"></div>
 </section>
 
-{# Counts intentionally come from implemented APIs/models; unsupported features display zero, not demo data. #}
+<!-- Counts intentionally come from implemented APIs/models; unsupported features display zero, not demo data. -->
 <section class="dashboard-stat-grid" aria-label="Workspace totals">
     <a class="dashboard-stat" href="{% url 'measurements' %}">
         <span class="dashboard-stat-icon stat-icon-mint"><i class="bi bi-rulers" aria-hidden="true"></i></span>

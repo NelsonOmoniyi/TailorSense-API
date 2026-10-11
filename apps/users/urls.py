@@ -1,3 +1,5 @@
+"""API routes for account registration, login, and signout."""
+
 from django.urls import path
 
 from . import api_views

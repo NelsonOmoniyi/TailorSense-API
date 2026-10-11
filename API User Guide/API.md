@@ -67,7 +67,9 @@ Login request fields: `email` and `password`.
 | `GET` | `/api/measurements/profiles/` | Session-authenticated user | Return only the signed-in user's profiles and measurement rows |
 | `POST` | `/api/measurements/profiles/` | Session-authenticated user | Atomically create a profile and its measurement rows |
 
-Profile creation uses type codes, not database IDs:
+Profile creation uses type codes, not database IDs. Every measurement is a
+linear dimension measured with a tape measure, so the only supported units are
+`cm` and `in`; the catalog contains no mass or weight types:
 
 ```json
 {
@@ -83,6 +85,8 @@ Profile creation uses type codes, not database IDs:
 ```
 
 The API creates the profile for the authenticated user and stores each entry as an individual `Measurement` row. Duplicate type codes in one profile are rejected. The Measurements dashboard obtains the type catalog and current user's profile list through these endpoints.
+
+> **Note on units:** Tailoring measurements are all linear, so `cm` and `in` are the only accepted units. Body weight was removed deliberately — a tape measure cannot capture mass and no pattern draft uses it.
 
 ## How the fabric API is used
 

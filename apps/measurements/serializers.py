@@ -89,19 +89,17 @@ class MeasurementProfileCreateSerializer(serializers.ModelSerializer):
         return measurements
 
     def validate(self, attrs):
-        """Resolve units from the profile for lengths and from the type for weight."""
+        """Resolve every entry's unit from the profile, since all types are linear."""
         profile_unit = attrs.get('unit', MeasurementProfile._meta.get_field('unit').default)
         for entry in attrs['measurements']:
             measurement_type = entry['measurement_type']
-            allowed_units = {'kg', 'lb'} if measurement_type.unit in {'kg', 'lb'} else {'cm', 'in'}
+            allowed_units = {'cm', 'in'}
             requested_unit = entry.get('unit')
             if requested_unit and requested_unit not in allowed_units:
                 raise serializers.ValidationError({
                     'measurements': f"{measurement_type.name} must use one of: {', '.join(sorted(allowed_units))}."
                 })
-            entry['unit'] = requested_unit or (
-                measurement_type.unit if measurement_type.unit in {'kg', 'lb'} else profile_unit
-            )
+            entry['unit'] = requested_unit or profile_unit
         return attrs
 
     @transaction.atomic

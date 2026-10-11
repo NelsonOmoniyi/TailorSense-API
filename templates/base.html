@@ -1,4 +1,8 @@
 {% load static %}
+<!-- Shared workspace shell for every authenticated page. Owns the sidebar
+     navigation, top bar, and content container; page templates extend this and
+     fill only the content block. Public pages (login, register, landing) use
+     their own lightweight templates instead. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,11 +15,6 @@
     <link rel="stylesheet" href="{% static 'css/workspace.css' %}?v=workspace-shell-20261003">
 </head>
 <body class="workspace-body">
-    {% comment %}
-        Authenticated pages extend this base. Keeping navigation here gives
-        every workspace screen the same landmarks and avoids duplicated menus.
-        Public landing and account pages use their own lightweight templates.
-    {% endcomment %}
     <div class="workspace-layout">
         <aside class="workspace-sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="workspaceSidebar" aria-label="Workspace navigation">
             <div class="workspace-sidebar-header">
@@ -26,7 +25,7 @@
             </div>
 
             <div class="offcanvas-body workspace-sidebar-body">
-                {# Each item points to a core-owned page; the active class follows Django's resolved route. #}
+                <!-- Each item points to a core-owned page; the active class follows Django's resolved route. -->
                 <nav class="workspace-navigation" aria-label="Main navigation">
                     <a class="workspace-nav-link{% if request.resolver_match.url_name == 'home' %} is-active{% endif %}" href="{% url 'home' %}">
                         <i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span>
@@ -54,7 +53,7 @@
                     </a>
                 </nav>
 
-                {# A quiet sidebar footer anchors navigation without taking space from page content. #}
+                <!-- A quiet sidebar footer anchors navigation without taking space from page content. -->
                 <div class="workspace-sidebar-note">
                     <i class="bi bi-scissors" aria-hidden="true"></i>
                     <div><strong>TailorSense</strong><span>Your tailoring workspace</span></div>
@@ -68,7 +67,7 @@
                     <i class="bi bi-list" aria-hidden="true"></i>
                 </button>
 
-                {# Global search currently targets the implemented fabric catalog. #}
+                <!-- Global search currently targets the implemented fabric catalog. -->
                 <form class="workspace-search" action="{% url 'fabrics-dashboard' %}" method="get" role="search">
                     <i class="bi bi-search" aria-hidden="true"></i>
                     <input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search fabrics..." aria-label="Search fabrics">
@@ -105,7 +104,7 @@
                 </div>
             </header>
 
-            {# Page templates supply only their main content; this frame owns shared spacing. #}
+            <!-- Page templates supply only their main content; this frame owns shared spacing. -->
             <div class="workspace-content">
                 {% block content %}{% endblock %}
             </div>

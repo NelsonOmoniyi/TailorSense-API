@@ -3,6 +3,10 @@
 {% block title %}Measurements | TailorSense{% endblock %}
 
 {% block content %}
+<!-- Measurements page. Lists the signed-in user's saved profiles and owns the
+     "Add profile" modal. The type catalog and saved profiles come from the
+     Measurements API via apps/core/views.py (measurements_dashboard,
+     add_measurement_profile). All values are linear (cm/in); there is no weight. -->
 <header class="workspace-page-heading">
 	<div>
 		<p class="workspace-page-kicker">MEASUREMENTS</p>
@@ -77,7 +81,7 @@
 	</aside>
 </div>
 
-{# One form submits a profile plus its nonblank values; core converts these repeated HTML fields to the API's nested JSON shape. #}
+<!-- One form submits a profile plus its nonblank values; core converts these repeated HTML fields to the API's nested JSON shape. -->
 <div class="modal fade localScroll" id="addMeasurementProfileModal" tabindex="-1" aria-labelledby="addMeasurementProfileTitle" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 		<div class="modal-content">
@@ -108,7 +112,7 @@
 					</div>
 
 					<h3 class="measurement-form-section-title">Measurement values</h3>
-					<p class="measurement-form-note">Enter at least one value. Lengths use the selected profile unit; weight uses its listed unit.</p>
+					<p class="measurement-form-note">Enter at least one value. All measurements use the selected profile unit.</p>
 					{% if measurement_types %}
 						<div class="measurement-entry-grid">
 							{% for measurement_type in measurement_types %}

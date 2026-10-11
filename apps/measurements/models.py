@@ -21,8 +21,6 @@ class ProfileUnit(models.TextChoices):
 class MeasurementUnit(models.TextChoices):
     CENTIMETERS = 'cm', 'Centimeters'
     INCHES = 'in', 'Inches'
-    KILOGRAMS = 'kg', 'Kilograms'
-    POUNDS = 'lb', 'Pounds'
 
 
 class MeasurementProfile(models.Model):

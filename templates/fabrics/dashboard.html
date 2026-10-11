@@ -3,6 +3,10 @@
 {% block title %}Fabrics Dashboard{% endblock %}
 
 {% block content %}
+<!-- Fabric catalog page. Renders the fabric cards returned by the fabric API and
+     owns the "Add Fabric" modal. Edit here to change how fabrics are listed or
+     added; the underlying data comes from apps.fabrics (see apps/core/views.py
+     fabric_dashboard and add_fabric). -->
 <div class="container py-4 py-lg-5">
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
@@ -26,6 +30,7 @@
     {% endif %}
 
     {% if fabrics %}
+        <!-- Catalog grid: one Bootstrap card per fabric record returned by the API. -->
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
             {% for fabric in fabrics %}
                 <div class="col">
@@ -59,12 +64,14 @@
             {% endfor %}
         </div>
     {% elif query %}
+        <!-- Empty state when a search returns nothing. -->
         <div class="border rounded bg-white text-center px-3 py-5" role="status">
             <h2 class="h5 mb-2">No fabrics match that search</h2>
             <p class="text-muted mb-3">Try a different fabric name, fiber, or category.</p>
             <a class="btn btn-outline-primary" href="{% url 'fabrics-dashboard' %}">Clear search</a>
         </div>
     {% else %}
+        <!-- Empty state when the catalog has no fabrics at all. -->
         <div class="border rounded bg-white text-center px-3 py-5" role="status">
             <h2 class="h5 mb-2">No fabrics yet</h2>
             <p class="text-muted mb-3">Add a fabric to begin building the catalog.</p>
@@ -75,6 +82,8 @@
     {% endif %}
 </div>
 
+<!-- "Add Fabric" modal. One form posts to the add-fabric route; core relays it to
+     the fabric API (apps/core/views.py:add_fabric). -->
 <div class="modal fade localScroll" id="addFabricModal" tabindex="-1" aria-labelledby="addFabricModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">

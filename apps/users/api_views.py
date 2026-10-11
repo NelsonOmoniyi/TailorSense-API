@@ -12,6 +12,12 @@ from .serializers import LoginSerializer, RegistrationSerializer
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
+    """Public endpoint that creates a User plus its required UserProfile.
+
+    The serializer owns all validation (unique email, password rules, phone
+    format) and writes the phone onto the profile because Django's built-in
+    User has no phone field.
+    """
     serializer = RegistrationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
@@ -25,6 +31,11 @@ def register(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
+    """Authenticate email/password and establish the browser session.
+
+    Delegates session creation to ``login_user`` so the hash-based identity
+    check in ``apps.users.auth`` stays the single source of truth.
+    """
     serializer = LoginSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
@@ -35,10 +46,9 @@ def login(request):
     )
     if user is None:
         return Response({'detail': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
     login_user(request, user)
-    # print("User logged in:", user.email, "Session key:", request.session.session_key)
-    
+
     return Response({'id': user.pk, 'email': user.email, 'fullname': user.first_name}, status=status.HTTP_200_OK)
 
 
@@ -46,6 +56,7 @@ def login(request):
 @permission_classes([IsAuthenticated])
 @authenticated_required
 def signout(request):
+    """Invalidate the current session for a signed-in user."""
     if get_authenticated_user(request) is None:
         return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
 

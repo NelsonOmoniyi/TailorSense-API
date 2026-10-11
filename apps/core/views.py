@@ -195,15 +195,16 @@ def home(request):
     APIs exist, rather than implying that sample records are persisted.
     """
     error, fabrics = _fetch_fabrics_from_api(request)
-    error, measurements = _fetch_measurement_api(request, '/api/measurements/profiles/')
+    measurements_error, measurements = _fetch_measurement_api(request, '/api/measurements/profiles/')
 
     data = {
         'fabrics_count': len(fabrics or []),
         'measurements_count': len(measurements or []),
-        'error': error,
+        'error': error or measurements_error,
     }
-    
-    return render(request, 'home.html', { 'data': data })
+
+    # The catalog preview reads ``fabrics`` at the top level, so pass it alongside the counts.
+    return render(request, 'home.html', { 'data': data, 'fabrics': fabrics or [] })
 
 
 @authenticated_required
@@ -273,15 +274,17 @@ def add_measurement_profile(request):
     """
     type_codes = request.POST.getlist('measurement_type_code')
     values = request.POST.getlist('measurement_value')
+    # Length rows inherit the profile unit (default cm); the API also accepts a per-row override.
+    profile_unit = request.POST.get('unit', 'cm')
     measurement_entries = [
-        {'measurement_type': code, 'value': value}
+        {'measurement_type': code, 'value': value, 'unit': profile_unit}
         for code, value in zip(type_codes, values)
         if value.strip()
     ]
     payload = {
         'name': request.POST.get('name', '').strip(),
         'gender': request.POST.get('gender', '').strip(),
-        'unit': request.POST.get('unit', 'cm'),
+        'unit': profile_unit,
         'measurements': measurement_entries,
     }
 
