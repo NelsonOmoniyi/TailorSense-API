@@ -8,17 +8,13 @@ class FabricAdmin(admin.ModelAdmin):
     list_display = (
         'fabric_name',
         'fiber_category',
-        'fiber',
-        'fabric_type',
-        'composition',
-        'construction',
         'weight',
         'stretch',
-        'structure',
+        'drape',
         'breathability',
         'opacity',
         'created_at',
         'updated_at',
     )
-    search_fields = ('fabric_name', 'fiber_category', 'composition', 'construction')
-    list_filter = ('fiber_category', 'construction', 'stretch', 'structure', 'breathability', 'opacity')
+    search_fields = ('fabric_name', 'fiber_category')
+    list_filter = ('fiber_category', 'stretch', 'drape', 'breathability', 'opacity')

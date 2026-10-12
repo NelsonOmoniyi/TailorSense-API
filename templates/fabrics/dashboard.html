@@ -38,19 +38,14 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <span class="badge text-bg-light border mb-2">{{ fabric.fiber_category|default:'Uncategorized' }}</span>
-                                <h2 class="h5 card-title mb-1">{{ fabric.fabric_name }}</h2>
-                                <p class="small text-muted mb-0">{{ fabric.fiber|default:'Fiber not specified' }} &middot; {{ fabric.fabric_type|default:'Type not specified' }}</p>
+                                <h2 class="h5 card-title mb-0">{{ fabric.fabric_name }}</h2>
                             </div>
 
                             <dl class="row small mb-0 gy-2">
-                                <dt class="col-5 text-muted fw-normal">Composition</dt>
-                                <dd class="col-7 mb-0">{{ fabric.composition }}</dd>
-                                <dt class="col-5 text-muted fw-normal">Construction</dt>
-                                <dd class="col-7 mb-0">{{ fabric.construction }}</dd>
                                 <dt class="col-5 text-muted fw-normal">Weight</dt>
                                 <dd class="col-7 mb-0">{{ fabric.weight|title }}</dd>
-                                <dt class="col-5 text-muted fw-normal">Structure</dt>
-                                <dd class="col-7 mb-0">{{ fabric.structure }}</dd>
+                                <dt class="col-5 text-muted fw-normal">Drape</dt>
+                                <dd class="col-7 mb-0">{{ fabric.drape|title }}</dd>
                                 <dt class="col-5 text-muted fw-normal">Stretch</dt>
                                 <dd class="col-7 mb-0">{{ fabric.stretch|title }}</dd>
                                 <dt class="col-5 text-muted fw-normal">Breathability</dt>
@@ -98,32 +93,29 @@
                         <legend class="fs-6 fw-semibold mb-3">Fabric details</legend>
                         <div class="row g-3">
                             <div class="col-12 col-sm-6">
-                                <label class="form-label" for="fabric_name">Fabric name</label>
+                                <label class="form-label" for="fabric_name">Fabric Name</label>
                                 <input class="form-control" id="fabric_name" name="fabric_name" maxlength="150" required>
                             </div>
                             <div class="col-12 col-sm-6">
-                                <label class="form-label" for="fiber_category">Fiber category</label>
-                                <input class="form-control" id="fiber_category" name="fiber_category" maxlength="100" required>
+                                <label class="form-label" for="fiber_category">Fiber Category</label>
+                                <select class="form-select" id="fiber_category" name="fiber_category" required>
+                                    <option value="" selected disabled>Select fiber category</option>
+                                    <option value="Natural Fiber">Natural Fiber</option>
+                                    <option value="Synthetic Fiber">Synthetic Fiber</option>
+                                    <option value="Semi-Synthetic Fiber">Semi-Synthetic Fiber</option>
+                                    <option value="Natural + Synthetic Fiber">Natural + Synthetic Fiber</option>
+                                </select>
+
                             </div>
                             <div class="col-12 col-sm-6">
-                                <label class="form-label" for="fiber">Fiber</label>
-                                <input class="form-control" id="fiber" name="fiber" maxlength="50" required>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <label class="form-label" for="fabric_type">Fabric type</label>
-                                <input class="form-control" id="fabric_type" name="fabric_type" maxlength="100" required>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <label class="form-label" for="composition">Composition</label>
-                                <input class="form-control" id="composition" name="composition" maxlength="200" required>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <label class="form-label" for="construction">Construction</label>
-                                <input class="form-control" id="construction" name="construction" maxlength="100" required>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <label class="form-label" for="structure">Structure</label>
-                                <input class="form-control" id="structure" name="structure" maxlength="20" required>
+                                <label class="form-label" for="drape">Drape</label>
+                                <select class="form-select" id="drape" name="drape" required>
+                                    <option value="" selected disabled>Select drape</option>
+                                    <option value="flowing">Flowing</option>
+                                    <option value="soft">Soft</option>
+                                    <option value="firm">Firm</option>
+                                    <option value="stiff">Stiff</option>
+                                </select>
                             </div>
                         </div>
                     </fieldset>

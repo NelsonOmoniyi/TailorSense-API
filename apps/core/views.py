@@ -346,7 +346,7 @@ def fabric_dashboard(request):
     query = request.GET.get('q', '').strip()
     if fabrics and query:
         normalized_query = query.casefold()
-        searchable_fields = ('fabric_name', 'fiber_category', 'fiber', 'fabric_type', 'composition')
+        searchable_fields = ('fabric_name', 'fiber_category')
         fabrics = [
             fabric for fabric in fabrics
             if any(normalized_query in str(fabric.get(field, '')).casefold() for field in searchable_fields)

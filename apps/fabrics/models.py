@@ -12,12 +12,14 @@ class Fabric(models.Model):
         MEDIUM = 'medium', 'Medium'
         HIGH = 'high', 'High'
 
+    class Drape(models.TextChoices):
+        FLOWING = 'flowing', 'Flowing'
+        SOFT = 'soft', 'Soft'
+        FIRM = 'firm', 'Firm'
+        STIFF = 'stiff', 'Stiff'
+
     fabric_name = models.CharField(max_length=150)
     fiber_category = models.CharField(max_length=100, blank=True)
-    fiber = models.CharField(max_length=50, blank=True)
-    fabric_type = models.CharField(max_length=100, blank=True)
-    composition = models.CharField(max_length=200, blank=True)
-    construction = models.CharField(max_length=100, blank=True)
     weight = models.CharField(max_length=100, blank=True)
     stretch = models.CharField(
         max_length=20,
@@ -25,7 +27,12 @@ class Fabric(models.Model):
         default=PropertyLevel.NONE,
         blank=True,
     )
-    structure = models.CharField(max_length=20, blank=True,)
+    drape = models.CharField(
+        max_length=20,
+        choices=Drape.choices,
+        default=Drape.SOFT,
+        blank=True,
+    )
     breathability = models.CharField(
         max_length=20,
         choices=PropertyLevel.choices,

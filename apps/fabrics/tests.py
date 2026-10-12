@@ -12,13 +12,9 @@ class FabricRecommendationModelTests(TestCase):
         required_fields = {
             'fabric_name',
             'fiber_category',
-            'fiber',
-            'fabric_type',
-            'composition',
-            'construction',
             'weight',
             'stretch',
-            'structure',
+            'drape',
             'breathability',
             'opacity',
             'created_at',
@@ -26,6 +22,10 @@ class FabricRecommendationModelTests(TestCase):
         }
 
         self.assertTrue(required_fields.issubset(field_names))
+        self.assertNotIn('fiber', field_names)
+        self.assertNotIn('fabric_type', field_names)
+        self.assertNotIn('composition', field_names)
+        self.assertNotIn('construction', field_names)
         self.assertNotIn('color', field_names)
         self.assertNotIn('price_per_meter', field_names)
         self.assertNotIn('stock_units', field_names)
@@ -46,13 +46,9 @@ class FabricApiTests(TestCase):
         self.payload = {
             'fabric_name': 'Cotton Poplin',
             'fiber_category': 'Natural',
-            'fiber': 'Cotton',
-            'fabric_type': 'Poplin',
-            'composition': '100% cotton',
-            'construction': 'Woven',
             'weight': '120 gsm',
             'stretch': 'none',
-            'structure': 'Plain weave',
+            'drape': 'soft',
             'breathability': 'high',
             'opacity': 'medium',
         }

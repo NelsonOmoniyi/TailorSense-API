@@ -128,7 +128,7 @@ class HomeSectionTests(TestCase):
     def test_dashboard_uses_shared_shell_and_real_fabric_count(self, mock_get):
         mock_get.return_value = SimpleNamespace(
             status_code=200,
-            json=lambda: [{'fabric_name': 'Cotton Poplin', 'fiber_category': 'Natural', 'composition': '100% cotton'}],
+            json=lambda: [{'fabric_name': 'Cotton Poplin', 'fiber_category': 'Natural'}],
         )
 
         response = self.client.get('/home/')
