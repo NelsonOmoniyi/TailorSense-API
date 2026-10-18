@@ -16,6 +16,8 @@ urlpatterns = [
     path('fabrics/add/', views.add_fabric, name='add-fabric'),
     # Each emerging domain has its own dashboard template and shares the shell from base.html.
     path('styles/', views.styles_dashboard, name='styles'),
+    path('styles/add/', views.add_style, name='styles-add'),
+    path('styles/<int:style_id>/', views.style_detail, name='style-detail-page'),
     path('recommendations/', views.recommendations_dashboard, name='recommendations'),
     # Account-level pages remain conditional sections in Home until they grow into their own apps.
     path('orders/', views.home_section, {'section': 'orders'}, name='orders'),

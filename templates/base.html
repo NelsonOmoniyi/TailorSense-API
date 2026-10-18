@@ -39,7 +39,7 @@
                     <a class="workspace-nav-link{% if request.resolver_match.url_name == 'fabrics-dashboard' %} is-active{% endif %}" href="{% url 'fabrics-dashboard' %}">
                         <i class="bi bi-layers" aria-hidden="true"></i><span>Fabrics</span>
                     </a>
-                    <a class="workspace-nav-link{% if request.resolver_match.url_name == 'styles' %} is-active{% endif %}" href="{% url 'styles' %}">
+                    <a class="workspace-nav-link{% if request.resolver_match.url_name == 'styles' or request.resolver_match.url_name == 'style-detail-page' %} is-active{% endif %}" href="{% url 'styles' %}">
                         <i class="bi bi-stars" aria-hidden="true"></i><span>Styles</span>
                     </a>
                     <a class="workspace-nav-link{% if request.resolver_match.url_name == 'recommendations' %} is-active{% endif %}" href="{% url 'recommendations' %}">

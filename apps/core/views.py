@@ -12,7 +12,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from django.shortcuts import redirect, render
+from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from apps import users
@@ -315,12 +317,131 @@ def add_measurement_profile(request):
 
 @authenticated_required
 def styles_dashboard(request):
-    """Render Styles UI from its own template under the shared base shell.
+    """Render catalogue data and filter choices from the authenticated Styles API."""
+    query = request.GET.get('q', '').strip()
+    garment_filter = request.GET.get('garment', '').strip()
+    params = {'q': query, 'garment': garment_filter}
+    api_error = None
+    styles, garments = [], []
+    try:
+        api_response = requests.get(
+            request.build_absolute_uri('/api/v1/styles/'), params=params,
+            cookies=request.COOKIES, timeout=10,
+        )
+        garment_response = requests.get(
+            request.build_absolute_uri('/api/v1/garments/'),
+            cookies=request.COOKIES, timeout=10,
+        )
+        if api_response.ok:
+            styles = api_response.json()
+        else:
+            api_error = 'Styles are temporarily unavailable. Please try again shortly.'
+        if garment_response.ok:
+            garments = garment_response.json()
+    except requests.RequestException:
+        api_error = 'Styles are temporarily unavailable. Please try again shortly.'
+    return render(request, 'styles/dashboard.html', {
+        'styles': styles, 'garments': garments, 'query': query,
+        'selected_garment': garment_filter, 'error': api_error,
+    })
 
-    Style records and filters will be supplied by the Styles domain when it is
-    implemented; this view intentionally does not manufacture catalog data.
-    """
-    return render(request, 'styles/dashboard.html')
+
+@authenticated_required
+def style_detail(request, style_id):
+    """Render one style through the shared detail template using API data."""
+    try:
+        response = requests.get(
+            request.build_absolute_uri(f'/api/v1/styles/{style_id}/'),
+            cookies=request.COOKIES,
+            timeout=10,
+        )
+    except requests.RequestException:
+        return render(request, 'styles/detail.html', {
+            'error': 'Style details are temporarily unavailable. Please try again shortly.',
+        }, status=503)
+
+    if response.status_code == 404:
+        raise Http404('Style not found.')
+    if response.status_code in {401, 403}:
+        return redirect('login')
+    if not response.ok:
+        return render(request, 'styles/detail.html', {
+            'error': 'Style details are temporarily unavailable. Please try again shortly.',
+        }, status=503)
+
+    style = response.json()
+    images = style.get('images', [])
+    primary_image = next((image for image in images if image.get('is_primary')), images[0] if images else None)
+    gallery_images = [image for image in images if image is not primary_image]
+    return render(request, 'styles/detail.html', {
+        'style': style,
+        'primary_image': primary_image,
+        'gallery_images': gallery_images,
+    })
+
+
+@authenticated_required
+@require_POST
+def add_style(request):
+    """Relay the catalogue form to the authenticated Styles API."""
+    style_name = request.POST.get('name', '').strip()
+    payload = {
+        'name': style_name,
+        'slug': slugify(style_name),
+        'garment_id': request.POST.get('garment_id', '').strip(),
+        'gender': request.POST.get('gender', '').strip(),
+        'category': request.POST.get('category', '').strip(),
+        'description': request.POST.get('description', '').strip(),
+    }
+    uploaded_image = request.FILES.get('image')
+    try:
+        response = requests.post(
+            request.build_absolute_uri('/api/v1/styles/'),
+            json=payload,
+            cookies=request.COOKIES,
+            headers=_api_headers(request),
+            timeout=10,
+        )
+    except requests.RequestException:
+        messages.error(request, 'We could not add this style right now. Please try again shortly.')
+        return redirect('styles')
+
+    if response.status_code == 201:
+        messages.success(request, 'Style added to the catalogue.')
+        if uploaded_image:
+            style_id = response.json().get('id')
+            image_data = {
+                'view_type': 'front',
+                'alt_text': f"Front view of {style_name}"[:255],
+                'is_primary': 'true',
+            }
+            image_file = (
+                uploaded_image.name,
+                uploaded_image,
+                uploaded_image.content_type or 'application/octet-stream',
+            )
+            try:
+                image_response = requests.post(
+                    request.build_absolute_uri(f'/api/v1/styles/{style_id}/images/'),
+                    data=image_data,
+                    files={'image': image_file},
+                    cookies=request.COOKIES,
+                    headers=_api_headers(request),
+                    timeout=30,
+                )
+            except requests.RequestException:
+                messages.warning(request, 'The style was saved, but its image could not be uploaded. You can add it later.')
+            else:
+                if image_response.status_code != 201:
+                    messages.warning(request, 'The style was saved, but its image could not be uploaded. Please check the image and try again.')
+    elif response.status_code in {401, 403}:
+        messages.error(request, 'Your session is no longer valid. Please sign in again.')
+        return redirect('login')
+    elif response.status_code == 400:
+        messages.error(request, _api_error_message(response, 'Please check the style details and try again.'))
+    else:
+        messages.error(request, 'The Styles service is temporarily unavailable. Please try again shortly.')
+    return redirect('styles')
 
 
 @authenticated_required

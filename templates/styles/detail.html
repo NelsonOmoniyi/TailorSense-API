@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if style %}{{ style.name }}{% else %}Style details{% endif %} | TailorSense{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+<nav class="style-detail-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'styles' %}"><i class="bi bi-arrow-left me-2" aria-hidden="true"></i>Back to styles</a>
+    {% if style %}<span aria-hidden="true">/</span><span>{{ style.name }}</span>{% endif %}
+</nav>
+
+{% if error %}
+    <div class="alert alert-warning" role="status">{{ error }}</div>
+{% elif style %}
+    <header class="style-detail-heading">
+        <div>
+            <p class="workspace-page-kicker">{{ style.garment.name }}{% if style.gender %} · {{ style.gender|title }}{% endif %}</p>
+            <h1>{{ style.name }}</h1>
+            {% if style.description %}<p class="style-detail-intro">{{ style.description }}</p>{% endif %}
+            <div class="style-detail-tags">
+                {% for occasion in style.occasions %}<span class="style-detail-tag"><i class="bi bi-calendar-event me-1" aria-hidden="true"></i>{{ occasion.name }}</span>{% endfor %}
+                {% if style.category %}<span class="style-detail-tag style-detail-tag-blue">{{ style.category|title }}</span>{% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="row g-4 align-items-start">
+        <div class="col-12 col-lg-7">
+            {% if primary_image %}
+                <figure class="style-detail-hero-image">
+                    <img src="{{ primary_image.image }}" alt="{{ primary_image.alt_text|default:style.name }}">
+                    <figcaption>{{ primary_image.view_type|title }} view</figcaption>
+                </figure>
+            {% else %}
+                <div class="style-detail-image-placeholder" role="img" aria-label="No image has been added for {{ style.name }}">
+                    <i class="bi bi-image" aria-hidden="true"></i><span>Style image coming soon</span>
+                </div>
+            {% endif %}
+
+            {% if gallery_images %}
+                <div class="row g-3 mt-0" aria-label="More views of {{ style.name }}">
+                    {% for image in gallery_images %}
+                        <div class="col-6 col-md-4">
+                            <figure class="style-detail-gallery-image">
+                                <img src="{{ image.image }}" alt="{{ image.alt_text|default:style.name }}" loading="lazy">
+                                <figcaption>{{ image.view_type|title }} view</figcaption>
+                            </figure>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <section class="style-detail-panel" aria-labelledby="design-details-title">
+                <div class="style-detail-panel-heading">
+                    <span class="style-detail-panel-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
+                    <div><h2 id="design-details-title">Design details</h2><p>Key information for this style</p></div>
+                </div>
+                <dl class="style-detail-attributes">
+                    <div><dt>Garment</dt><dd>{{ style.garment.name }}</dd></div>
+                    {% if style.gender %}<div><dt>Designed for</dt><dd>{{ style.gender|title }}</dd></div>{% endif %}
+                    {% if style.category %}<div><dt>Category</dt><dd>{{ style.category|title }}</dd></div>{% endif %}
+                    {% if style.silhouette %}<div><dt>Silhouette</dt><dd>{{ style.silhouette|title }}</dd></div>{% endif %}
+                    {% if style.fit_type %}<div><dt>Fit</dt><dd>{{ style.fit_type|title }}</dd></div>{% endif %}
+                    {% if style.complexity %}<div><dt>Sewing complexity</dt><dd>{{ style.complexity|title }}</dd></div>{% endif %}
+                    <div><dt>Availability</dt><dd><span class="style-status {% if style.is_active %}is-active{% else %}is-inactive{% endif %}">{% if style.is_active %}Available{% else %}Unavailable{% endif %}</span></dd></div>
+                </dl>
+            </section>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-12 col-xl-6">
+            <section class="style-detail-panel h-100" aria-labelledby="style-fabrics-title">
+                <div class="style-detail-panel-heading">
+                    <span class="style-detail-panel-icon fabric-icon"><i class="bi bi-layers" aria-hidden="true"></i></span>
+                    <div><h2 id="style-fabrics-title">Suitable fabrics</h2><p>Materials associated with this design</p></div>
+                </div>
+                {% if style.fabrics %}
+                    <div class="style-fabric-list">
+                        {% for link in style.fabrics %}
+                            {% if link.is_active %}
+                            <article class="style-fabric-item">
+                                <div class="style-fabric-heading"><h3>{{ link.fabric.fabric_name }}</h3><span class="style-suitability">{{ link.suitability|title }}</span></div>
+                                {% if link.notes %}<p>{{ link.notes }}</p>{% endif %}
+                            </article>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}<p class="style-detail-empty">No fabric recommendations have been added yet.</p>{% endif %}
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <section class="style-detail-panel h-100" aria-labelledby="style-measurements-title">
+                <div class="style-detail-panel-heading">
+                    <span class="style-detail-panel-icon measurement-icon"><i class="bi bi-rulers" aria-hidden="true"></i></span>
+                    <div><h2 id="style-measurements-title">Measurements needed</h2><p>Measurements used to tailor this design</p></div>
+                </div>
+                {% if style.measurement_requirements %}
+                    <div class="style-measurement-list">
+                        {% for requirement in style.measurement_requirements %}
+                        <article class="style-measurement-item">
+                            <span class="style-measurement-check"><i class="bi bi-check2" aria-hidden="true"></i></span>
+                            <div class="style-measurement-copy">
+                                <h3>{{ requirement.measurement_type.name }}</h3>
+                                {% if requirement.notes %}<p>{{ requirement.notes }}</p>{% endif %}
+                            </div>
+                            <span class="style-required-label {% if requirement.is_required %}is-required{% endif %}">{% if requirement.is_required %}Required{% else %}Optional{% endif %}</span>
+                        </article>
+                        {% endfor %}
+                    </div>
+                {% else %}<p class="style-detail-empty">Measurement requirements have not been added yet.</p>{% endif %}
+            </section>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

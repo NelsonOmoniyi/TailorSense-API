@@ -1,36 +1,113 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Styles | TailorSense{% endblock %}
 
 {% block content %}
-<!-- Styles catalog page. Currently an intentional empty state; when styles are
-     persisted, replace the placeholder panel with real records. -->
-<header class="workspace-page-heading">
-	<div>
-		<p class="workspace-page-kicker">STYLE CATALOG</p>
-		<h1>Styles</h1>
-		<p>Browse and manage clothing styles.</p>
-	</div>
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<header class="workspace-page-heading styles-heading">
+    <div><p class="workspace-page-kicker">STYLE CATALOG</p><h1>Styles</h1><p>Browse and manage clothing styles.</p></div>
 </header>
 
-<section class="workspace-panel catalog-empty-panel" aria-labelledby="style-catalog-title">
-	<div class="workspace-panel-heading">
-		<div>
-			<h2 id="style-catalog-title">Browse styles</h2>
-			<p>Explore clothing styles and save ideas for later.</p>
-		</div>
-	</div>
-	<div class="style-category-strip" aria-label="Style categories">
-		<span class="category-chip is-selected">All styles</span>
-		<span class="category-chip">Formal</span>
-		<span class="category-chip">Casual</span>
-		<span class="category-chip">Traditional</span>
-		<span class="category-chip">Smart casual</span>
-	</div>
-	<div class="workspace-empty-state">
-		<i class="bi bi-stars" aria-hidden="true"></i>
-		<h2>No styles to show yet</h2>
-		<p>Saved and generated styles will appear in this catalog.</p>
-	</div>
+{% if messages %}
+    {% for message in messages %}<div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}" role="status">{{ message }}</div>{% endfor %}
+{% endif %}
+<section class="styles-toolbar" aria-label="Style catalogue filters">
+    <div class="styles-toolbar-row d-flex flex-column flex-md-row align-items-md-center gap-3">
+    <form method="get" class="styles-search-form flex-grow-1 w-100">
+        <label class="visually-hidden" for="style-search">Search styles</label>
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="style-search" type="search" name="q" value="{{ query }}" placeholder="Search styles...">
+        <label class="visually-hidden" for="garment-filter">Filter by garment</label>
+        <select id="garment-filter" name="garment" onchange="this.form.submit()">
+            <option value="">All categories</option>
+            {% for garment in garments %}<option value="{{ garment.slug }}" {% if selected_garment == garment.slug %}selected{% endif %}>{{ garment.name }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search" aria-hidden="true"></i><span class="visually-hidden">Search</span></button>
+    </form>
+    <button class="btn btn-primary flex-shrink-0 align-self-start align-self-md-center me-3" type="button" data-bs-toggle="modal" data-bs-target="#addStyleModal">
+        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Style
+    </button>
+    </div>
 </section>
+
+{% if error %}<div class="alert alert-warning" role="status">{{ error }}</div>{% endif %}
+<section class="style-card-grid" aria-label="Styles">
+    {% for style in styles %}
+    <article class="style-card">
+        <div class="style-card-image">
+            {% with primary_image=style.images.0 %}
+                {% if primary_image.image %}<img src="{{ primary_image.image }}" alt="{{ primary_image.alt_text|default:style.name }}" loading="lazy">
+                {% else %}<div class="style-image-placeholder" aria-hidden="true"><i class="bi bi-stars"></i></div>{% endif %}
+            {% endwith %}
+            <span class="style-card-menu" aria-label="{{ style.garment.name }}"><i class="bi bi-three-dots" aria-hidden="true"></i></span>
+        </div>
+        <div class="style-card-body">
+            <p class="style-card-category">{{ style.garment.name }}{% if style.gender %} · {{ style.gender|title }}{% endif %}</p>
+            <h2>{{ style.name }}</h2>
+            {% if style.description %}<p class="style-card-description">{{ style.description|truncatechars:105 }}</p>{% endif %}
+            <div class="style-card-footer">
+                {% for occasion in style.occasions|slice:":2" %}<span class="style-tag">{{ occasion.name }}</span>{% endfor %}
+                <a href="{% url 'style-detail-page' style.id %}" class="style-view-link">View details <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="styles-empty-state">
+        <span class="styles-empty-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
+        <h2>{% if query or selected_garment %}No matching styles{% else %}No styles to show yet{% endif %}</h2>
+        <p>{% if query or selected_garment %}Try another search or choose a different category.{% else %}Styles added to your catalogue will appear here.{% endif %}</p>
+    </div>
+    {% endfor %}
+</section>
+
+<div class="modal fade localScroll" id="addStyleModal" tabindex="-1" aria-labelledby="addStyleModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="{% url 'styles-add' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="addStyleModalTitle">Add style</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="new-style-name">Style name</label>
+                        <input class="form-control" id="new-style-name" name="name" type="text" maxlength="200" placeholder="e.g. Slim-Fit Formal Trousers" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="new-style-garment">Garment</label>
+                        <select class="form-select" id="new-style-garment" name="garment_id" required>
+                            <option value="" selected disabled>Choose a garment</option>
+                            {% for garment in garments %}<option value="{{ garment.id }}">{{ garment.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="new-style-gender">Gender</label>
+                            <select class="form-select" id="new-style-gender" name="gender"><option value="">Any</option><option value="female">Female</option><option value="male">Male</option><option value="unisex">Unisex</option></select>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="new-style-category">Category</label>
+                            <select class="form-select" id="new-style-category" name="category"><option value="">Choose</option><option value="traditional">Traditional</option><option value="casual">Casual</option><option value="corporate">Corporate</option><option value="formal">Formal</option></select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label" for="new-style-description">Description</label>
+                        <textarea class="form-control" id="new-style-description" name="description" rows="3" placeholder="Optional details"></textarea>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label" for="new-style-image">Style image</label>
+                        <input class="form-control" id="new-style-image" name="image" type="file" accept="image/*">
+                        <div class="form-text">Optional. Choose an image for the style’s main catalogue view.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save style</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

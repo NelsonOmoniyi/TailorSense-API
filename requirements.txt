@@ -4,6 +4,7 @@ Django>=5.2,<6.0
 # Environment and API support
 python-dotenv
 requests
+Pillow
 
 # REST API and auth
 djangorestframework
