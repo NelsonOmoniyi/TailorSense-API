@@ -6,6 +6,9 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from apps.fabrics.models import Fabric
+from apps.fabrics.services import sync_style_fabric_recommendations
+
 from apps.styles.models import Garment, Occasion, Style
 
 
@@ -74,6 +77,15 @@ class Command(BaseCommand):
         # styles attached to categories outside the approved active catalogue.
         Garment.objects.exclude(slug__in=active_garment_slugs).update(is_active=False)
         Style.objects.filter(garment__is_active=False).update(is_active=False)
+
+        # Keep the fabric links in sync when fabrics have already been seeded.
+        # If this command runs first on a new database, seed_fabrics will create
+        # the links after it creates the fabric records.
+        if Fabric.objects.exists():
+            link_summary = sync_style_fabric_recommendations()
+            self.stdout.write(
+                f'{link_summary["links_added"]} style-fabric recommendation links added.'
+            )
 
         self.stdout.write(self.style.SUCCESS(
             f'Catalogue synced: {len(active_garment_slugs)} active categories and {style_count} active styles.'

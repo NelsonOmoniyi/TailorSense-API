@@ -1,0 +1,900 @@
+{
+  "shirts/classic-button-front-shirt": [
+    "Poplin",
+    "Oxford Cotton",
+    "Chambray"
+  ],
+  "shirts/dress-shirt": [
+    "Broadcloth",
+    "Twill",
+    "Poplin"
+  ],
+  "shirts/oxford-shirt": [
+    "Oxford Cotton",
+    "Pinpoint Oxford"
+  ],
+  "shirts/button-down-shirt": [
+    "Oxford Cotton",
+    "Chambray",
+    "Flannel"
+  ],
+  "shirts/band-collar-shirt": [
+    "Linen",
+    "Cotton Blend",
+    "Chambray"
+  ],
+  "shirts/grandad-collar-shirt": [
+    "Linen",
+    "Cotton",
+    "Rayon"
+  ],
+  "shirts/camp-collar-shirt": [
+    "Rayon",
+    "Viscose",
+    "Linen"
+  ],
+  "shirts/cuban-collar-shirt": [
+    "Linen",
+    "Silk Blend",
+    "Rayon"
+  ],
+  "shirts/mandarin-collar-shirt": [
+    "Silk Blend",
+    "Brocade",
+    "Fine Cotton"
+  ],
+  "shirts/henley-shirt": [
+    "Cotton Jersey",
+    "Rib Knit",
+    "Thermal Cotton"
+  ],
+  "shirts/overshirt": [
+    "Denim",
+    "Corduroy",
+    "Heavy Twill"
+  ],
+  "shirts/utility-shirt": [
+    "Canvas",
+    "Twill",
+    "Ripstop"
+  ],
+  "shirts/western-shirt": [
+    "Denim",
+    "Chambray",
+    "Twill"
+  ],
+  "shirts/tunic-shirt": [
+    "Cotton",
+    "Linen",
+    "Rayon"
+  ],
+  "shirts/pleated-front-shirt": [
+    "Piqué",
+    "Broadcloth",
+    "Silk"
+  ],
+  "shirts/raglan-sleeve-shirt": [
+    "Cotton Jersey",
+    "French Terry"
+  ],
+  "shirts/short-sleeve-shirt": [
+    "Cotton",
+    "Poplin",
+    "Linen"
+  ],
+  "shirts/long-sleeve-shirt": [
+    "Poplin",
+    "Twill",
+    "Broadcloth"
+  ],
+  "shirts/peplum-shirt": [
+    "Cotton",
+    "Crepe",
+    "Jersey"
+  ],
+  "shirts/asymmetric-shirt": [
+    "Poplin",
+    "Linen",
+    "Silk"
+  ],
+  "trousers/straight-leg-trousers": [
+    "Wool Blend",
+    "Gabardine",
+    "Twill"
+  ],
+  "trousers/slim-fit-trousers": [
+    "Stretch Cotton",
+    "Wool Blend",
+    "Chino"
+  ],
+  "trousers/skinny-trousers": [
+    "Denim",
+    "Spandex Blend",
+    "Cotton Twill"
+  ],
+  "trousers/tapered-trousers": [
+    "Wool Blend",
+    "Trousers Twill",
+    "Linen Blend"
+  ],
+  "trousers/wide-leg-trousers": [
+    "Linen",
+    "Silk",
+    "Lightweight Wool"
+  ],
+  "trousers/flared-trousers": [
+    "Denim",
+    "Crepe",
+    "Stretch Cotton"
+  ],
+  "trousers/bootcut-trousers": [
+    "Gabardine",
+    "Stretch Wool",
+    "Twill"
+  ],
+  "trousers/palazzo-trousers": [
+    "Chiffon",
+    "Silk",
+    "Georgette"
+  ],
+  "trousers/culotte-trousers": [
+    "Linen",
+    "Crepe",
+    "Cotton"
+  ],
+  "trousers/barrel-leg-trousers": [
+    "Denim",
+    "Heavy Twill",
+    "Canvas"
+  ],
+  "trousers/carrot-fit-trousers": [
+    "Cotton Twill",
+    "Linen",
+    "Wool Blend"
+  ],
+  "trousers/pleated-front-trousers": [
+    "Wool Gabardine",
+    "Cashmere Blend",
+    "Tropical Wool"
+  ],
+  "trousers/flat-front-trousers": [
+    "Chino",
+    "Cotton Twill",
+    "Poplin Blend"
+  ],
+  "trousers/high-waisted-trousers": [
+    "Crepe",
+    "Wool Blend",
+    "Linen"
+  ],
+  "trousers/mid-rise-trousers": [
+    "Denim",
+    "Chino",
+    "Cotton Blend"
+  ],
+  "trousers/low-rise-trousers": [
+    "Denim",
+    "Stretch Cotton",
+    "Corduroy"
+  ],
+  "trousers/cropped-trousers": [
+    "Linen",
+    "Cotton",
+    "Lightweight Twill"
+  ],
+  "trousers/ankle-length-trousers": [
+    "Crepe",
+    "Gabardine",
+    "Stretch Wool"
+  ],
+  "trousers/full-length-trousers": [
+    "Wool",
+    "Silk Blend",
+    "Velvet"
+  ],
+  "trousers/cargo-trousers": [
+    "Ripstop",
+    "Cotton Canvas",
+    "Twill"
+  ],
+  "trousers/drawstring-trousers": [
+    "Linen",
+    "Cotton Jersey",
+    "French Terry"
+  ],
+  "trousers/elastic-waist-trousers": [
+    "Cotton",
+    "Jersey",
+    "Linen"
+  ],
+  "trousers/paperbag-waist-trousers": [
+    "Linen",
+    "Cotton",
+    "Crepe"
+  ],
+  "trousers/pegged-trousers": [
+    "Wool Blend",
+    "Cotton Twill",
+    "Linen"
+  ],
+  "trousers/harem-trousers": [
+    "Rayon",
+    "Silk",
+    "Cotton"
+  ],
+  "trousers/jeans-style-trousers": [
+    "Denim",
+    "Selvedge Denim",
+    "Heavy Cotton"
+  ],
+  "trousers/formal-tailored-trousers": [
+    "Wool Gabardine",
+    "Barathea",
+    "Silk Blend"
+  ],
+  "trousers/womens-flowing-trousers": [
+    "Chiffon",
+    "Crepe de Chine",
+    "Silk"
+  ],
+  "trousers/womens-wide-base-trousers": [
+    "Crepe",
+    "Satin",
+    "Linen"
+  ],
+  "agbada/classic-agbada": [
+    "Aso Oke",
+    "Damask",
+    "Brocade"
+  ],
+  "agbada/embroidered-agbada": [
+    "Damask",
+    "Brocade",
+    "Velvet"
+  ],
+  "agbada/minimalist-agbada": [
+    "Linen",
+    "Rich Cotton",
+    "Raw Silk"
+  ],
+  "agbada/short-agbada": [
+    "Cotton",
+    "Linen",
+    "Ankara"
+  ],
+  "agbada/long-agbada": [
+    "Damask",
+    "Brocade",
+    "Guipure Lace"
+  ],
+  "agbada/wide-sleeve-agbada": [
+    "Brocade",
+    "Damask",
+    "Organza"
+  ],
+  "agbada/layered-agbada-ensemble": [
+    "Damask",
+    "Brocade",
+    "Cotton"
+  ],
+  "agbada/formal-agbada": [
+    "Heavy Brocade",
+    "Damask",
+    "Silk"
+  ],
+  "agbada/ceremonial-agbada": [
+    "Gold-Thread Brocade",
+    "Velvet",
+    "Damask"
+  ],
+  "agbada/modern-tailored-agbada": [
+    "Wool Blend",
+    "Damask",
+    "High-Grade Cotton"
+  ],
+  "agbada/contrast-embroidery-agbada": [
+    "Brocade",
+    "Damask",
+    "Rich Cotton"
+  ],
+  "agbada/panelled-agbada": [
+    "Brocade",
+    "Damask",
+    "Raw Silk"
+  ],
+  "kaftan/classic-kaftan": [
+    "Cotton",
+    "Linen",
+    "Senator Fabric"
+  ],
+  "kaftan/senator-kaftan": [
+    "Poly-Cotton Blend",
+    "Cashmere Fabric",
+    "Senator Crepe"
+  ],
+  "kaftan/mandarin-collar-kaftan": [
+    "Senator Fabric",
+    "Silk Blend",
+    "Brocade"
+  ],
+  "kaftan/round-neck-kaftan": [
+    "Cotton",
+    "Linen",
+    "Ankara"
+  ],
+  "kaftan/v-neck-kaftan": [
+    "Linen",
+    "Cotton",
+    "Rayon"
+  ],
+  "kaftan/embroidered-kaftan": [
+    "Senator Crepe",
+    "Brocade",
+    "Rich Cotton"
+  ],
+  "kaftan/minimalist-kaftan": [
+    "Linen",
+    "Cotton",
+    "Rayon"
+  ],
+  "kaftan/short-kaftan": [
+    "Cotton",
+    "Linen",
+    "Ankara"
+  ],
+  "kaftan/long-kaftan": [
+    "Brocade",
+    "Silk",
+    "Damask"
+  ],
+  "kaftan/zip-front-kaftan": [
+    "Senator Fabric",
+    "Cotton Blend",
+    "Twill"
+  ],
+  "kaftan/button-placket-kaftan": [
+    "Cotton",
+    "Senator Fabric",
+    "Linen"
+  ],
+  "kaftan/contrast-panel-kaftan": [
+    "Senator Crepe",
+    "Brocade",
+    "Cotton Blend"
+  ],
+  "kaftan/two-tone-kaftan": [
+    "Cotton",
+    "Senator Fabric",
+    "Linen"
+  ],
+  "kaftan/short-sleeve-kaftan": [
+    "Cotton",
+    "Linen",
+    "Ankara"
+  ],
+  "kaftan/long-sleeve-kaftan": [
+    "Senator Crepe",
+    "Silk Blend",
+    "Cotton"
+  ],
+  "kaftan/kaftan-with-matching-trousers": [
+    "Senator Fabric",
+    "Poly-Cotton",
+    "Cashmere Fabric"
+  ],
+  "kaftan/kaftan-with-chest-pocket": [
+    "Cotton",
+    "Senator Fabric",
+    "Linen"
+  ],
+  "kaftan/kaftan-with-side-slits": [
+    "Linen",
+    "Cotton",
+    "Rayon"
+  ],
+  "kaftan/asymmetric-placket-kaftan": [
+    "Senator Fabric",
+    "Cotton Blend",
+    "Linen"
+  ],
+  "kaftan/belted-kaftan": [
+    "Silk",
+    "Crepe",
+    "Linen"
+  ],
+  "kaftan/open-kaftan": [
+    "Chiffon",
+    "Silk",
+    "Organza"
+  ],
+  "kaftan/kaftan-gown": [
+    "Crepe",
+    "Silk",
+    "Ankara"
+  ],
+  "gowns/bubu-gown": [
+    "Ankara",
+    "Adire",
+    "Chiffon"
+  ],
+  "gowns/flare-gown": [
+    "Satin",
+    "Crepe",
+    "Organza"
+  ],
+  "gowns/a-line-gown": [
+    "Duchesse Satin",
+    "Crepe",
+    "Velvet"
+  ],
+  "gowns/fitted-gown": [
+    "Crepe",
+    "Velvet",
+    "Silk Satin"
+  ],
+  "gowns/mermaid-gown": [
+    "Lace",
+    "Tulle",
+    "Satin"
+  ],
+  "gowns/trumpet-gown": [
+    "Satin",
+    "Crepe",
+    "Organza"
+  ],
+  "gowns/straight-gown": [
+    "Crepe",
+    "Silk",
+    "Brocade"
+  ],
+  "gowns/column-gown": [
+    "Silk Satin",
+    "Velvet",
+    "Crepe"
+  ],
+  "gowns/flare-and-fitted-gown": [
+    "Satin",
+    "Tulle",
+    "Lace"
+  ],
+  "gowns/empire-waist-gown": [
+    "Chiffon",
+    "Silk",
+    "Georgette"
+  ],
+  "gowns/fit-and-flare-gown": [
+    "Cotton Blend",
+    "Satin",
+    "Crepe"
+  ],
+  "gowns/ball-gown": [
+    "Tulle",
+    "Organza",
+    "Duchesse Satin"
+  ],
+  "gowns/evening-gown": [
+    "Silk Velvet",
+    "Chiffon",
+    "Satin"
+  ],
+  "gowns/off-shoulder-gown": [
+    "Crepe",
+    "Satin",
+    "Lace"
+  ],
+  "gowns/one-shoulder-gown": [
+    "Satin",
+    "Chiffon",
+    "Crepe"
+  ],
+  "gowns/halter-neck-gown": [
+    "Silk",
+    "Crepe",
+    "Satin"
+  ],
+  "gowns/wrap-gown": [
+    "Jersey",
+    "Cotton",
+    "Crepe"
+  ],
+  "gowns/shirt-gown": [
+    "Poplin",
+    "Linen",
+    "Chambray"
+  ],
+  "gowns/pleated-gown": [
+    "Chiffon",
+    "Pleated Satin",
+    "Georgette"
+  ],
+  "gowns/tiered-gown": [
+    "Cotton",
+    "Organza",
+    "Chiffon"
+  ],
+  "gowns/high-low-gown": [
+    "Satin",
+    "Organza",
+    "High-Low Crepe"
+  ],
+  "gowns/smock-gown": [
+    "Cotton",
+    "Linen",
+    "Rayon"
+  ],
+  "gowns/babydoll-gown": [
+    "Cotton",
+    "Chiffon",
+    "Jersey"
+  ],
+  "gowns/drop-waist-gown": [
+    "Crepe",
+    "Silk",
+    "Satin"
+  ],
+  "gowns/cape-gown": [
+    "Chiffon",
+    "Crepe",
+    "Silk"
+  ],
+  "gowns/corset-bodice-gown": [
+    "Satin",
+    "Brocade",
+    "Tulle"
+  ],
+  "gowns/lace-gown": [
+    "French Lace",
+    "Guipure Lace",
+    "Corded Lace"
+  ],
+  "gowns/aso-ebi-gown": [
+    "Aso Ebi Lace",
+    "Ankara",
+    "Velvet"
+  ],
+  "gowns/bridal-gown": [
+    "Duchesse Satin",
+    "Tulle",
+    "Chantilly Lace"
+  ],
+  "gowns/prom-gown": [
+    "Satin",
+    "Sequins",
+    "Tulle"
+  ],
+  "gowns/kaftan-gown": [
+    "Crepe",
+    "Silk",
+    "Ankara"
+  ],
+  "gowns/bishop-sleeve-gown": [
+    "Chiffon",
+    "Silk",
+    "Crepe"
+  ],
+  "gowns/puff-sleeve-gown": [
+    "Organza",
+    "Cotton",
+    "Taffeta"
+  ],
+  "gowns/peplum-waist-gown": [
+    "Crepe",
+    "Satin",
+    "Brocade"
+  ],
+  "gowns/asymmetric-gown": [
+    "Crepe",
+    "Satin",
+    "Silk"
+  ],
+  "skirts/a-line-skirt": [
+    "Cotton Twill",
+    "Denim",
+    "Wool"
+  ],
+  "skirts/pencil-skirt": [
+    "Crepe",
+    "Stretch Wool",
+    "Tweed"
+  ],
+  "skirts/straight-skirt": [
+    "Cotton Twill",
+    "Wool Blend",
+    "Linen"
+  ],
+  "skirts/circle-skirt": [
+    "Cotton",
+    "Poplin",
+    "Lightweight Wool"
+  ],
+  "skirts/half-circle-skirt": [
+    "Cotton",
+    "Crepe",
+    "Linen"
+  ],
+  "skirts/pleated-skirt": [
+    "Polyester",
+    "Wool Blend",
+    "Cotton"
+  ],
+  "skirts/knife-pleat-skirt": [
+    "Chiffon",
+    "Crepe",
+    "Polyester"
+  ],
+  "skirts/box-pleat-skirt": [
+    "Cotton Twill",
+    "Wool",
+    "Heavy Poplin"
+  ],
+  "skirts/accordion-pleat-skirt": [
+    "Georgette",
+    "Chiffon",
+    "Pleated Metallic"
+  ],
+  "skirts/inverted-pleat-skirt": [
+    "Wool Blend",
+    "Gabardine",
+    "Tweed"
+  ],
+  "skirts/wrap-skirt": [
+    "Linen",
+    "Cotton",
+    "Rayon"
+  ],
+  "skirts/gathered-skirt": [
+    "Cotton",
+    "Chiffon",
+    "Linen"
+  ],
+  "skirts/tiered-skirt": [
+    "Cotton",
+    "Rayon",
+    "Linen"
+  ],
+  "skirts/gored-skirt": [
+    "Crepe",
+    "Cotton Twill",
+    "Lightweight Wool"
+  ],
+  "skirts/mermaid-skirt": [
+    "Satin",
+    "Crepe",
+    "Lace"
+  ],
+  "skirts/trumpet-skirt": [
+    "Crepe",
+    "Satin",
+    "Silk"
+  ],
+  "skirts/tulip-skirt": [
+    "Crepe",
+    "Cotton",
+    "Brocade"
+  ],
+  "skirts/asymmetric-skirt": [
+    "Crepe",
+    "Linen",
+    "Denim"
+  ],
+  "skirts/godet-skirt": [
+    "Crepe",
+    "Silk",
+    "Cotton"
+  ],
+  "skirts/slip-skirt": [
+    "Satin",
+    "Silk",
+    "Charmeuse"
+  ],
+  "skirts/kilt-style-skirt": [
+    "Tartan Wool",
+    "Tweed",
+    "Cotton Twill"
+  ],
+  "skirts/bubble-skirt": [
+    "Taffeta",
+    "Organza",
+    "Cotton Poplin"
+  ],
+  "skirts/peplum-skirt": [
+    "Crepe",
+    "Stretch Wool",
+    "Brocade"
+  ],
+  "skirts/culotte-skirt": [
+    "Linen",
+    "Crepe",
+    "Cotton"
+  ],
+  "skirts/high-low-skirt": [
+    "Chiffon",
+    "High-Low Crepe",
+    "Satin"
+  ],
+  "skirts/maxi-skirt": [
+    "Cotton",
+    "Jersey",
+    "Rayon"
+  ],
+  "skirts/midi-skirt": [
+    "Cotton",
+    "Crepe",
+    "Linen"
+  ],
+  "skirts/mini-skirt": [
+    "Denim",
+    "Corduroy",
+    "Leather"
+  ],
+  "skirts/panelled-skirt": [
+    "Cotton Twill",
+    "Denim",
+    "Crepe"
+  ],
+  "skirts/flared-skirt": [
+    "Cotton",
+    "Crepe",
+    "Wool Blend"
+  ],
+  "blouses/button-front-blouse": [
+    "Poplin",
+    "Broadcloth",
+    "Silk"
+  ],
+  "blouses/side-zip-blouse": [
+    "Crepe",
+    "Satin",
+    "Silk"
+  ],
+  "blouses/back-zip-blouse": [
+    "Crepe",
+    "Cotton Blend",
+    "Satin"
+  ],
+  "blouses/peplum-blouse": [
+    "Crepe",
+    "Brocade",
+    "Stretch Wool"
+  ],
+  "blouses/wrap-blouse": [
+    "Jersey",
+    "Silk",
+    "Crepe"
+  ],
+  "blouses/tie-front-blouse": [
+    "Cotton",
+    "Linen",
+    "Rayon"
+  ],
+  "blouses/tie-neck-blouse": [
+    "Silk",
+    "Chiffon",
+    "Crepe de Chine"
+  ],
+  "blouses/puff-sleeve-blouse": [
+    "Cotton",
+    "Organza",
+    "Poplin"
+  ],
+  "blouses/bishop-sleeve-blouse": [
+    "Chiffon",
+    "Silk",
+    "Georgette"
+  ],
+  "blouses/bell-sleeve-blouse": [
+    "Rayon",
+    "Cotton",
+    "Chiffon"
+  ],
+  "blouses/raglan-sleeve-blouse": [
+    "Cotton Jersey",
+    "French Terry",
+    "Rayon"
+  ],
+  "blouses/off-shoulder-blouse": [
+    "Cotton",
+    "Rayon",
+    "Linen"
+  ],
+  "blouses/one-shoulder-blouse": [
+    "Satin",
+    "Crepe",
+    "Silk"
+  ],
+  "blouses/halter-neck-blouse": [
+    "Jersey",
+    "Silk",
+    "Cotton"
+  ],
+  "blouses/bardot-blouse": [
+    "Cotton",
+    "Rayon",
+    "Linen"
+  ],
+  "blouses/smocked-blouse": [
+    "Cotton",
+    "Rayon",
+    "Cotton Lawn"
+  ],
+  "blouses/ruffle-front-blouse": [
+    "Chiffon",
+    "Organza",
+    "Silk"
+  ],
+  "blouses/pleated-blouse": [
+    "Georgette",
+    "Crepe",
+    "Chiffon"
+  ],
+  "blouses/draped-blouse": [
+    "Silk Jersey",
+    "Charmeuse",
+    "Chiffon"
+  ],
+  "blouses/tunic-blouse": [
+    "Cotton",
+    "Linen",
+    "Rayon"
+  ],
+  "blouses/sleeveless-blouse": [
+    "Crepe",
+    "Silk",
+    "Cotton Poplin"
+  ],
+  "blouses/collared-blouse": [
+    "Poplin",
+    "Broadcloth",
+    "Cotton Blend"
+  ],
+  "blouses/round-neck-blouse": [
+    "Cotton",
+    "Jersey",
+    "Rayon"
+  ],
+  "blouses/v-neck-blouse": [
+    "Cotton",
+    "Jersey",
+    "Linen"
+  ],
+  "blouses/square-neck-blouse": [
+    "Cotton",
+    "Linen",
+    "Crepe"
+  ],
+  "blouses/keyhole-blouse": [
+    "Crepe",
+    "Silk",
+    "Satin"
+  ],
+  "blouses/button-back-blouse": [
+    "Poplin",
+    "Crepe",
+    "Cotton Blend"
+  ],
+  "blouses/corset-style-blouse": [
+    "Brocade",
+    "Satin",
+    "Heavy Cotton"
+  ],
+  "blouses/asymmetric-blouse": [
+    "Crepe",
+    "Poplin",
+    "Silk"
+  ],
+  "blouses/peasant-blouse": [
+    "Cotton Lawn",
+    "Rayon",
+    "Voile"
+  ],
+  "blouses/kimono-sleeve-blouse": [
+    "Silk",
+    "Rayon",
+    "Chiffon"
+  ],
+  "blouses/high-low-blouse": [
+    "Chiffon",
+    "Crepe",
+    "Satin"
+  ]
+}
