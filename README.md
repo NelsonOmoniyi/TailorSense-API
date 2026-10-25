@@ -56,7 +56,7 @@ TailorSense/
 
 The authenticated workspace shell lives in `templates/base.html`. It owns the shared sidebar, search bar, notification menu, account menu, and responsive mobile navigation. Home content lives in `templates/home.html`; Fabrics, Measurements, Styles, and Recommendations each own a `dashboard.html` template in their respective template directories. The Styles app provides a persistent catalogue and authenticated API; Recommendations remains a placeholder.
 
-The Measurements schema stores one row per profile/type pair instead of adding a column for every body measurement. Measurement Garments declare required or optional types through a join table. The Styles catalogue has its own Garment model for broad clothing categories; style requirements point to existing MeasurementType records. Its repeatable sample-data command populates example catalogue rows without inventing fabric or measurement types.
+The Measurements schema stores one row per profile/type pair instead of adding a column for every body measurement. Measurement Garments declare required or optional types through a join table. The Styles catalogue has its own Garment model for broad clothing categories; style requirements point to existing MeasurementType records. Fabric and style catalogue snapshots are data migrations, so a fresh database receives the catalogues, image references, and recommendation links as part of `python manage.py migrate`.
 
 ## Authentication pattern
 
@@ -81,7 +81,7 @@ The Measurements schema stores one row per profile/type pair instead of adding a
 - `/api/v1/styles/{id}/images/` — list or upload images using multipart form data; image URLs are returned through configured Django storage.
 - `/api/v1/styles/{id}/fabrics/` and `/api/v1/styles/{id}/measurements/` — list or add existing fabric and measurement-type associations.
 
-Use `python manage.py seed_styles` to idempotently sync the approved catalogue: seven active garment categories and 180 described styles. Older categories and styles are archived rather than deleted. The command does not create images or invent fabric/measurement links. In development, uploaded images are served from `/media/`; configure an appropriate storage backend in deployed environments.
+The migrations seed 127 fabrics, 16 garment categories, 3 occasions, 188 styles, style images, fabric recommendations, and measurement requirements. The referenced catalogue images are included under `media/`. In development, uploaded images are served from `/media/`; configure an appropriate storage backend in deployed environments.
 
 Core-rendered routes include `/`, `/login/`, `/register/`, `/home/`, `/profile/`, `/measurements/`, `/fabrics/`, `/styles/`, `/recommendations/`, `/orders/`, and `/settings/`.
 For API request and response formats, refer to [API User Guide/API.md](API%20User%20Guide/API.md).

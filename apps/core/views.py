@@ -382,6 +382,56 @@ def style_detail(request, style_id):
 
 @authenticated_required
 @require_POST
+def update_style_image(request, style_id):
+    """Upload a replacement primary image for a style from its detail page."""
+    uploaded_image = request.FILES.get('image')
+    if not uploaded_image:
+        messages.error(request, 'Choose an image to upload.')
+        return redirect('style-detail-page', style_id=style_id)
+
+    try:
+        detail_response = requests.get(
+            request.build_absolute_uri(f'/api/v1/styles/{style_id}/'),
+            cookies=request.COOKIES, timeout=10,
+        )
+        if detail_response.status_code == 404:
+            raise Http404('Style not found.')
+        if detail_response.status_code in {401, 403}:
+            return redirect('login')
+        if not detail_response.ok:
+            messages.error(request, 'Style details are temporarily unavailable. Please try again shortly.')
+            return redirect('style-detail-page', style_id=style_id)
+        images = detail_response.json().get('images', [])
+        primary = next((item for item in images if item.get('is_primary')), images[0] if images else None)
+        image_file = (uploaded_image.name, uploaded_image, uploaded_image.content_type or 'application/octet-stream')
+        if primary:
+            response = requests.patch(
+                request.build_absolute_uri(f"/api/v1/styles/{style_id}/images/{primary['id']}/"),
+                data={'is_primary': 'true'}, files={'image': image_file},
+                cookies=request.COOKIES, headers=_api_headers(request), timeout=30,
+            )
+        else:
+            response = requests.post(
+                request.build_absolute_uri(f'/api/v1/styles/{style_id}/images/'),
+                data={'view_type': 'front', 'alt_text': f"Front view of {detail_response.json().get('name', 'style')}"[:255], 'is_primary': 'true'},
+                files={'image': image_file}, cookies=request.COOKIES,
+                headers=_api_headers(request), timeout=30,
+            )
+    except requests.RequestException:
+        messages.error(request, 'We could not update the style image. Please try again shortly.')
+    else:
+        if response.status_code in {200, 201}:
+            messages.success(request, 'Style image updated.')
+        elif response.status_code in {401, 403}:
+            messages.error(request, 'Your session is no longer valid. Please sign in again.')
+            return redirect('login')
+        else:
+            messages.error(request, _api_error_message(response, 'We could not update the style image.'))
+    return redirect('style-detail-page', style_id=style_id)
+
+
+@authenticated_required
+@require_POST
 def add_style(request):
     """Relay the catalogue form to the authenticated Styles API."""
     style_name = request.POST.get('name', '').strip()
@@ -477,6 +527,59 @@ def fabric_dashboard(request):
         'error': error,
         'query': query,
     })
+
+
+@authenticated_required
+def fabric_detail(request, fabric_id):
+    """Render one fabric in a detail page backed by the authenticated API."""
+    try:
+        response = requests.get(
+            request.build_absolute_uri(f'/api/fabrics/{fabric_id}/'),
+            cookies=request.COOKIES, timeout=10,
+        )
+    except requests.RequestException:
+        return render(request, 'fabrics/detail.html', {
+            'error': 'Fabric details are temporarily unavailable. Please try again shortly.',
+        }, status=503)
+    if response.status_code == 404:
+        raise Http404('Fabric not found.')
+    if response.status_code in {401, 403}:
+        return redirect('login')
+    if not response.ok:
+        return render(request, 'fabrics/detail.html', {
+            'error': 'Fabric details are temporarily unavailable. Please try again shortly.',
+        }, status=503)
+    return render(request, 'fabrics/detail.html', {'fabric': response.json()})
+
+
+@authenticated_required
+@require_POST
+def update_fabric_image(request, fabric_id):
+    """Replace a fabric's image using the API's partial update endpoint."""
+    uploaded_image = request.FILES.get('image')
+    if not uploaded_image:
+        messages.error(request, 'Choose an image to upload.')
+        return redirect('fabric-detail-page', fabric_id=fabric_id)
+    image_file = (uploaded_image.name, uploaded_image, uploaded_image.content_type or 'application/octet-stream')
+    try:
+        response = requests.patch(
+            request.build_absolute_uri(f'/api/fabrics/{fabric_id}/'),
+            files={'image': image_file}, cookies=request.COOKIES,
+            headers=_api_headers(request), timeout=30,
+        )
+    except requests.RequestException:
+        messages.error(request, 'We could not update the fabric image. Please try again shortly.')
+    else:
+        if response.status_code == 200:
+            messages.success(request, 'Fabric image updated.')
+        elif response.status_code == 404:
+            raise Http404('Fabric not found.')
+        elif response.status_code in {401, 403}:
+            messages.error(request, 'Your session is no longer valid. Please sign in again.')
+            return redirect('login')
+        else:
+            messages.error(request, _api_error_message(response, 'We could not update the fabric image.'))
+    return redirect('fabric-detail-page', fabric_id=fabric_id)
 
 
 @authenticated_required

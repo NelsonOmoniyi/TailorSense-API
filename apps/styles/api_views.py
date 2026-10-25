@@ -82,6 +82,15 @@ class StyleImageListCreateView(AuthenticatedAPIViewMixin, generics.ListCreateAPI
         serializer.save(style=style)
 
 
+class StyleImageDetailView(AuthenticatedAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve, replace, or remove an image belonging to one style."""
+
+    serializer_class = StyleImageSerializer
+
+    def get_queryset(self):
+        return StyleImage.objects.filter(style_id=self.kwargs['style_id'])
+
+
 class StyleFabricManageView(AuthenticatedAPIViewMixin, generics.ListCreateAPIView):
     """List suitable fabrics or attach a fabric to a style."""
 

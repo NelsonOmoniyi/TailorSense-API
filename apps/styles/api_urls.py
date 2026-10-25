@@ -12,6 +12,7 @@ urlpatterns = [
     path('styles/', api_views.StyleListCreateView.as_view(), name='style-list'),
     path('styles/<int:pk>/', api_views.StyleDetailView.as_view(), name='style-detail'),
     path('styles/<int:style_id>/images/', api_views.StyleImageListCreateView.as_view(), name='style-images'),
+    path('styles/<int:style_id>/images/<int:pk>/', api_views.StyleImageDetailView.as_view(), name='style-image-detail'),
     path('styles/<int:style_id>/fabrics/', api_views.StyleFabricManageView.as_view(), name='style-fabrics'),
     path('styles/<int:style_id>/measurements/', api_views.StyleMeasurementManageView.as_view(), name='style-measurements'),
 ]

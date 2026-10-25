@@ -33,3 +33,13 @@ class FabricSerializer(serializers.ModelSerializer):
             'breathability': {'required': True},
             'opacity': {'required': True},
         }
+
+    def update(self, instance, validated_data):
+        replacement = validated_data.get('image')
+        if replacement and instance.image:
+            existing_name = instance.image.name
+            # Keep the established fabric filename instead of deriving a new
+            # name from the uploaded file or adding a storage collision suffix.
+            instance.image.storage.delete(existing_name)
+            replacement.name = existing_name.rsplit('/', 1)[-1]
+        return super().update(instance, validated_data)

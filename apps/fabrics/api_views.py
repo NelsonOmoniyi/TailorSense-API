@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from apps.users.auth import authenticated_required, get_authenticated_user
 from .models import Fabric
@@ -40,3 +41,27 @@ def add_fabric(request):
         FabricSerializer(fabric, context={'request': request}).data,
         status=status.HTTP_201_CREATED,
     )
+
+
+@api_view(['GET', 'PATCH', 'PUT'])
+@permission_classes([IsAuthenticated])
+@authenticated_required
+def fabric_detail(request, fabric_id):
+    """Retrieve or update one fabric, including its uploaded image."""
+    if get_authenticated_user(request) is None:
+        return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    fabric = get_object_or_404(Fabric, pk=fabric_id)
+    if request.method == 'GET':
+        serializer = FabricSerializer(fabric, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    serializer = FabricSerializer(
+        fabric,
+        data=request.data,
+        partial=request.method == 'PATCH',
+        context={'request': request},
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(FabricSerializer(fabric, context={'request': request}).data, status=status.HTTP_200_OK)

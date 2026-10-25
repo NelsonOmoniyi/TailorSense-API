@@ -14,10 +14,13 @@ urlpatterns = [
     # Fabrics has a data-backed API; core renders its dashboard and relays add-form submissions.
     path('fabrics/', views.fabric_dashboard, name='fabrics-dashboard'),
     path('fabrics/add/', views.add_fabric, name='add-fabric'),
+    path('fabrics/<int:fabric_id>/', views.fabric_detail, name='fabric-detail-page'),
+    path('fabrics/<int:fabric_id>/image/', views.update_fabric_image, name='fabric-image-update'),
     # Each emerging domain has its own dashboard template and shares the shell from base.html.
     path('styles/', views.styles_dashboard, name='styles'),
     path('styles/add/', views.add_style, name='styles-add'),
     path('styles/<int:style_id>/', views.style_detail, name='style-detail-page'),
+    path('styles/<int:style_id>/image/', views.update_style_image, name='style-image-update'),
     path('recommendations/', views.recommendations_dashboard, name='recommendations'),
     # Account-level pages remain conditional sections in Home until they grow into their own apps.
     path('orders/', views.home_section, {'section': 'orders'}, name='orders'),

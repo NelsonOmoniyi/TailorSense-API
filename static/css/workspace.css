@@ -640,6 +640,44 @@
     box-shadow: 0 5px 18px rgba(21, 41, 79, .045);
 }
 
+.fabric-summary-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    color: #17243c;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.fabric-summary-card .fabric-card-image {
+    align-self: stretch;
+    width: 100%;
+}
+
+.fabric-summary-copy {
+    display: flex;
+    min-height: 94px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .55rem;
+    margin: .25rem .85rem .85rem;
+    padding: .8rem .9rem;
+    border: 1px solid #edf0f5;
+    border-radius: 10px;
+    background: #fbfcfe;
+}
+
+.fabric-summary-copy h2 {
+    line-height: 1.35;
+}
+
+.fabric-summary-card:hover,
+.fabric-summary-card:focus-visible {
+    transform: translateY(-2px);
+    color: #17243c;
+    box-shadow: 0 12px 26px rgba(21, 41, 79, .1);
+}
+
 .fabric-card-image {
     display: grid;
     height: 150px;

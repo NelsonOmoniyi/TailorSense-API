@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Fabrics Dashboard{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
 <!-- Fabric catalog page. Renders the fabric cards returned by the fabric API and
      owns the "Add Fabric" modal. Edit here to change how fabrics are listed or
      added; the underlying data comes from apps.fabrics (see apps/core/views.py
@@ -32,32 +34,17 @@
     {% if fabrics %}
         <div class="fabric-card-grid">
             {% for fabric in fabrics %}
-                <article class="fabric-card">
+                <a href="{% url 'fabric-detail-page' fabric.id %}" class="fabric-card fabric-summary-card text-decoration-none">
                     {% if fabric.image %}
                         <div class="fabric-card-image"><img src="{{ fabric.image }}" alt="{{ fabric.fabric_name }} fabric swatch" loading="lazy"></div>
                     {% else %}
                         <div class="fabric-card-image fabric-card-image-placeholder" role="img" aria-label="No image for {{ fabric.fabric_name }}"><i class="bi bi-layers" aria-hidden="true"></i></div>
                     {% endif %}
-                    <div class="fabric-card-body">
-                        <div class="mb-3">
-                            <span class="badge text-bg-light border mb-2">{{ fabric.fiber_category|default:'Uncategorized' }}</span>
-                            <h2 class="h5 card-title mb-0">{{ fabric.fabric_name }}</h2>
-                        </div>
-
-                        <dl class="row small mb-0 gy-2">
-                            <dt class="col-5 text-muted fw-normal">Weight</dt>
-                            <dd class="col-7 mb-0">{{ fabric.weight|title }}</dd>
-                            <dt class="col-5 text-muted fw-normal">Drape</dt>
-                            <dd class="col-7 mb-0">{{ fabric.drape|title }}</dd>
-                            <dt class="col-5 text-muted fw-normal">Stretch</dt>
-                            <dd class="col-7 mb-0">{{ fabric.stretch|title }}</dd>
-                            <dt class="col-5 text-muted fw-normal">Breathability</dt>
-                            <dd class="col-7 mb-0">{{ fabric.breathability|title }}</dd>
-                            <dt class="col-5 text-muted fw-normal">Opacity</dt>
-                            <dd class="col-7 mb-0">{{ fabric.opacity|title }}</dd>
-                        </dl>
+                    <div class="fabric-summary-copy">
+                        <span class="badge text-bg-light border align-self-start">{{ fabric.fiber_category|default:'Uncategorized' }}</span>
+                        <h2 class="h5 card-title mb-0">{{ fabric.fabric_name }}</h2>
                     </div>
-                </article>
+                </a>
             {% endfor %}
         </div>
     {% elif query %}

@@ -34,6 +34,16 @@ class StyleImageSerializer(serializers.ModelSerializer):
             data['image'] = request.build_absolute_uri(data['image'])
         return data
 
+    def update(self, instance, validated_data):
+        replacement = validated_data.get('image')
+        if replacement and instance.image:
+            existing_name = instance.image.name
+            # Reuse the same catalogue filename; deleting first prevents storage
+            # backends from appending a collision suffix during the save.
+            instance.image.storage.delete(existing_name)
+            replacement.name = existing_name.rsplit('/', 1)[-1]
+        return super().update(instance, validated_data)
+
 
 class StyleFabricReadSerializer(serializers.ModelSerializer):
     fabric = serializers.SerializerMethodField()
