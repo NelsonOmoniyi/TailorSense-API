@@ -19,6 +19,7 @@ class Fabric(models.Model):
         STIFF = 'stiff', 'Stiff'
 
     fabric_name = models.CharField(max_length=150)
+    image = models.ImageField(upload_to='fabrics/', blank=True)
     fiber_category = models.CharField(max_length=100, blank=True)
     weight = models.CharField(max_length=100, blank=True)
     stretch = models.CharField(

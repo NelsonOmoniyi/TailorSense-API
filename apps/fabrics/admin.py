@@ -7,6 +7,7 @@ from .models import Fabric
 class FabricAdmin(admin.ModelAdmin):
     list_display = (
         'fabric_name',
+        'image',
         'fiber_category',
         'weight',
         'stretch',

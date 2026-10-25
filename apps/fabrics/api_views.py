@@ -20,7 +20,7 @@ def fabric_list(request):
         return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
 
     fabrics = Fabric.objects.order_by('fabric_name')
-    serializer = FabricSerializer(fabrics, many=True)
+    serializer = FabricSerializer(fabrics, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -28,7 +28,7 @@ def fabric_list(request):
 @permission_classes([IsAuthenticated])
 @authenticated_required
 def add_fabric(request):
-    """Create one fabric record from either JSON or form-encoded API input."""
+    """Create one fabric record from JSON, form-encoded, or multipart API input."""
     user = get_authenticated_user(request)
     if user is None:
         return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -36,4 +36,7 @@ def add_fabric(request):
     serializer = FabricSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     fabric = serializer.save()
-    return Response(FabricSerializer(fabric).data, status=status.HTTP_201_CREATED)
+    return Response(
+        FabricSerializer(fabric, context={'request': request}).data,
+        status=status.HTTP_201_CREATED,
+    )

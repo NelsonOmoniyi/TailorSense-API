@@ -491,11 +491,22 @@ def add_fabric(request):
     api_url = request.build_absolute_uri('/api/fabrics/add/')
     csrf_token = request.COOKIES.get('csrftoken')
     headers = {'X-CSRFToken': csrf_token} if csrf_token else {}
+    uploaded_image = request.FILES.get('image')
+    files = None
+    if uploaded_image:
+        files = {
+            'image': (
+                uploaded_image.name,
+                uploaded_image,
+                uploaded_image.content_type or 'application/octet-stream',
+            ),
+        }
 
     try:
         response = requests.post(
             api_url,
             data=request.POST,
+            files=files,
             cookies=request.COOKIES,
             headers=headers,
             timeout=10,

@@ -13,6 +13,7 @@ class FabricSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'fabric_name',
+            'image',
             'fiber_category',
             'weight',
             'stretch',

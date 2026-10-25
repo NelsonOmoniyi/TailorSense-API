@@ -30,32 +30,34 @@
     {% endif %}
 
     {% if fabrics %}
-        <!-- Catalog grid: one Bootstrap card per fabric record returned by the API. -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        <div class="fabric-card-grid">
             {% for fabric in fabrics %}
-                <div class="col">
-                    <article class="card h-100 border shadow-sm">
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <span class="badge text-bg-light border mb-2">{{ fabric.fiber_category|default:'Uncategorized' }}</span>
-                                <h2 class="h5 card-title mb-0">{{ fabric.fabric_name }}</h2>
-                            </div>
-
-                            <dl class="row small mb-0 gy-2">
-                                <dt class="col-5 text-muted fw-normal">Weight</dt>
-                                <dd class="col-7 mb-0">{{ fabric.weight|title }}</dd>
-                                <dt class="col-5 text-muted fw-normal">Drape</dt>
-                                <dd class="col-7 mb-0">{{ fabric.drape|title }}</dd>
-                                <dt class="col-5 text-muted fw-normal">Stretch</dt>
-                                <dd class="col-7 mb-0">{{ fabric.stretch|title }}</dd>
-                                <dt class="col-5 text-muted fw-normal">Breathability</dt>
-                                <dd class="col-7 mb-0">{{ fabric.breathability|title }}</dd>
-                                <dt class="col-5 text-muted fw-normal">Opacity</dt>
-                                <dd class="col-7 mb-0">{{ fabric.opacity|title }}</dd>
-                            </dl>
+                <article class="fabric-card">
+                    {% if fabric.image %}
+                        <div class="fabric-card-image"><img src="{{ fabric.image }}" alt="{{ fabric.fabric_name }} fabric swatch" loading="lazy"></div>
+                    {% else %}
+                        <div class="fabric-card-image fabric-card-image-placeholder" role="img" aria-label="No image for {{ fabric.fabric_name }}"><i class="bi bi-layers" aria-hidden="true"></i></div>
+                    {% endif %}
+                    <div class="fabric-card-body">
+                        <div class="mb-3">
+                            <span class="badge text-bg-light border mb-2">{{ fabric.fiber_category|default:'Uncategorized' }}</span>
+                            <h2 class="h5 card-title mb-0">{{ fabric.fabric_name }}</h2>
                         </div>
-                    </article>
-                </div>
+
+                        <dl class="row small mb-0 gy-2">
+                            <dt class="col-5 text-muted fw-normal">Weight</dt>
+                            <dd class="col-7 mb-0">{{ fabric.weight|title }}</dd>
+                            <dt class="col-5 text-muted fw-normal">Drape</dt>
+                            <dd class="col-7 mb-0">{{ fabric.drape|title }}</dd>
+                            <dt class="col-5 text-muted fw-normal">Stretch</dt>
+                            <dd class="col-7 mb-0">{{ fabric.stretch|title }}</dd>
+                            <dt class="col-5 text-muted fw-normal">Breathability</dt>
+                            <dd class="col-7 mb-0">{{ fabric.breathability|title }}</dd>
+                            <dt class="col-5 text-muted fw-normal">Opacity</dt>
+                            <dd class="col-7 mb-0">{{ fabric.opacity|title }}</dd>
+                        </dl>
+                    </div>
+                </article>
             {% endfor %}
         </div>
     {% elif query %}
@@ -82,7 +84,7 @@
 <div class="modal fade localScroll" id="addFabricModal" tabindex="-1" aria-labelledby="addFabricModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="{% url 'add-fabric' %}" method="post">
+            <form action="{% url 'add-fabric' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-header">
                     <h2 class="modal-title fs-5" id="addFabricModalLabel">Add fabric</h2>
@@ -164,6 +166,11 @@
                             </div>
                         </div>
                     </fieldset>
+                    <div class="mt-4">
+                        <label class="form-label" for="fabric-image">Fabric image</label>
+                        <input class="form-control" id="fabric-image" name="image" type="file" accept="image/*">
+                        <div class="form-text">Optional. Add a clear photo of the fabric swatch.</div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
