@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
-from .models import Garment, Style
+from .models import Garment, Style, StyleMeasurementRequirement
 
 
 class MeasurementSpecificationValidationTests(TestCase):
@@ -45,3 +45,44 @@ class MeasurementSpecificationValidationTests(TestCase):
                 'measurement_specification_validated_at',
             },
         )
+
+    def test_agbada_pilot_is_seeded_as_draft_with_source_and_conditions(self):
+        style = Style.objects.get(garment__slug='agbada', slug='classic-agbada')
+        agbada_styles = Style.objects.filter(garment__slug='agbada', is_active=True)
+        requirements = {
+            item.measurement_type.code: item
+            for item in StyleMeasurementRequirement.objects.filter(style=style).select_related(
+                'measurement_type'
+            )
+        }
+
+        self.assertEqual(
+            style.measurement_specification_status,
+            Style.MeasurementSpecificationStatus.DRAFT,
+        )
+        self.assertEqual(agbada_styles.count(), 12)
+        self.assertTrue(all(
+            item.measurement_specification_status == Style.MeasurementSpecificationStatus.DRAFT
+            and item.measurement_requirements.count() == 12
+            for item in agbada_styles
+        ))
+        self.assertIn('User-supplied Agbada checklist', style.measurement_specification_source)
+        self.assertEqual(len(requirements), 12)
+        self.assertTrue(requirements['agbada_length'].is_required)
+        self.assertEqual(
+            requirements['agbada_length'].notes,
+            'Source / Reviewer: Traditional Tailoring Guild Standard',
+        )
+        self.assertEqual(
+            requirements['thigh_circumference'].condition,
+            'Only if the style includes Sokoto Kembe (three-quarter, loose).',
+        )
+        self.assertEqual(
+            requirements['embroidery_area_width'].condition,
+            'Only if the style includes custom chest embroidery.',
+        )
+        self.assertEqual(
+            requirements['embroidery_area_depth'].condition,
+            requirements['embroidery_area_width'].condition,
+        )
+        self.assertFalse(requirements['fila_head_circumference'].is_required)
