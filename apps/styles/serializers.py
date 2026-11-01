@@ -61,11 +61,22 @@ class StyleMeasurementReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StyleMeasurementRequirement
-        fields = ['id', 'measurement_type', 'is_required', 'notes', 'display_order']
+        fields = [
+            'id', 'measurement_type', 'is_required', 'purpose', 'instructions',
+            'condition', 'notes', 'display_order',
+        ]
 
     def get_measurement_type(self, obj):
         item = obj.measurement_type
-        return {'id': item.pk, 'name': item.name, 'code': item.code, 'unit': item.unit, 'category': item.category}
+        return {
+            'id': item.pk,
+            'name': item.name,
+            'code': item.code,
+            'unit': item.unit,
+            'category': item.category,
+            'gender': item.gender,
+            'description': item.description,
+        }
 
 
 class StyleSerializer(serializers.ModelSerializer):
@@ -86,9 +97,17 @@ class StyleSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'garment', 'garment_id', 'gender', 'category', 'description',
             'silhouette', 'fit_type', 'occasions', 'occasion_ids', 'complexity', 'is_active',
+            'measurement_specification_status', 'measurement_specification_source',
+            'measurement_specification_reviewed_by', 'measurement_specification_reviewed_at',
+            'measurement_specification_validated_by', 'measurement_specification_validated_at',
             'images', 'fabrics', 'measurement_requirements', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = [
+            'id', 'measurement_specification_status', 'measurement_specification_source',
+            'measurement_specification_reviewed_by', 'measurement_specification_reviewed_at',
+            'measurement_specification_validated_by', 'measurement_specification_validated_at',
+            'created_at', 'updated_at',
+        ]
 
     def validate_slug(self, value):
         garment = self.initial_data.get('garment_id')
@@ -145,5 +164,8 @@ class StyleMeasurementWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StyleMeasurementRequirement
-        fields = ['id', 'measurement_type_id', 'is_required', 'notes', 'display_order']
+        fields = [
+            'id', 'measurement_type_id', 'is_required', 'purpose', 'instructions',
+            'condition', 'notes', 'display_order',
+        ]
         read_only_fields = ['id']

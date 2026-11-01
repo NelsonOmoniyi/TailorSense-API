@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
+from django.utils import timezone
 
 from apps.fabrics.models import Fabric
 from apps.measurements.models import Measurement, MeasurementProfile, MeasurementType
@@ -45,7 +46,11 @@ class RecommendationsApiTests(APITestCase):
         )
         self.fabric = Fabric.objects.create(fabric_name='Recommendation Test Cotton')
         self.occasion, _ = Occasion.objects.get_or_create(name='Casual')
-        self.style = self.make_style('Everyday Gown', 'everyday-gown')
+        self.style = self.make_style(
+            'Everyday Gown',
+            'everyday-gown',
+            measurement_specification_status=Style.MeasurementSpecificationStatus.REVIEWED,
+        )
         self.link_style(self.style, StyleFabric.Suitability.EXCELLENT)
         StyleMeasurementRequirement.objects.create(
             style=self.style,
@@ -54,13 +59,38 @@ class RecommendationsApiTests(APITestCase):
         )
         self.style.occasions.add(self.occasion)
 
-    def make_style(self, name, slug, *, gender='female', active=True):
+    def make_style(
+        self,
+        name,
+        slug,
+        *,
+        gender='female',
+        active=True,
+        measurement_specification_status=Style.MeasurementSpecificationStatus.NOT_CONFIGURED,
+    ):
+        review_fields = {}
+        if measurement_specification_status in {
+            Style.MeasurementSpecificationStatus.REVIEWED,
+            Style.MeasurementSpecificationStatus.VALIDATED,
+        }:
+            review_fields.update({
+                'measurement_specification_source': 'Tailor-reviewed test checklist',
+                'measurement_specification_reviewed_by': 'Test tailor',
+                'measurement_specification_reviewed_at': timezone.now(),
+            })
+        if measurement_specification_status == Style.MeasurementSpecificationStatus.VALIDATED:
+            review_fields.update({
+                'measurement_specification_validated_by': 'Test validator',
+                'measurement_specification_validated_at': timezone.now(),
+            })
         return Style.objects.create(
             name=name,
             slug=slug,
             garment=self.garment,
             gender=gender,
             is_active=active,
+            measurement_specification_status=measurement_specification_status,
+            **review_fields,
         )
 
     def link_style(self, style, suitability, *, active=True, fabric=None):
@@ -138,7 +168,11 @@ class RecommendationsApiTests(APITestCase):
         self.link_style(unsuitable, StyleFabric.Suitability.UNSUITABLE)
         inactive_link = self.make_style('Inactive Link Gown', 'inactive-link-gown')
         self.link_style(inactive_link, StyleFabric.Suitability.GOOD, active=False)
-        incomplete = self.make_style('Incomplete Gown', 'incomplete-gown')
+        incomplete = self.make_style(
+            'Incomplete Gown',
+            'incomplete-gown',
+            measurement_specification_status=Style.MeasurementSpecificationStatus.REVIEWED,
+        )
         self.link_style(incomplete, StyleFabric.Suitability.EXCELLENT)
         waist, _ = MeasurementType.objects.get_or_create(
             code='waist',
@@ -160,6 +194,19 @@ class RecommendationsApiTests(APITestCase):
         self.assertEqual(
             response.data['missing_measurements'],
             [{'code': 'waist', 'name': 'Waist'}],
+        )
+        self.assertEqual(
+            response.data['excluded_for_measurements'],
+            [{
+                'style_id': incomplete.pk,
+                'name': incomplete.name,
+                'measurement_check': {
+                    'status': 'incomplete',
+                    'specification_status': Style.MeasurementSpecificationStatus.REVIEWED,
+                    'missing_measurements': [{'code': 'waist', 'name': 'Waist'}],
+                },
+                'missing_measurements': [{'code': 'waist', 'name': 'Waist'}],
+            }],
         )
 
     def test_rejects_unauthenticated_and_foreign_profiles(self):
@@ -245,3 +292,131 @@ class RecommendationsApiTests(APITestCase):
         self.assertEqual(result['score'], 78.6)
         self.assertEqual(result['missing_measurements'], [{'code': 'waist', 'name': 'Waist'}])
         self.assertEqual(response.data['missing_measurements'], [])
+        self.assertEqual(result['measurement_check']['status'], 'optional_missing')
+
+    def test_unreviewed_checklists_are_unknown_and_do_not_gate_or_score(self):
+        draft = self.make_style(
+            'Draft Checklist Gown',
+            'draft-checklist-gown',
+            measurement_specification_status=Style.MeasurementSpecificationStatus.DRAFT,
+        )
+        self.link_style(draft, StyleFabric.Suitability.EXCELLENT)
+        waist, _ = MeasurementType.objects.get_or_create(
+            code='waist',
+            defaults={'name': 'Waist', 'category': 'torso'},
+        )
+        StyleMeasurementRequirement.objects.create(style=draft, measurement_type=waist)
+        unconfigured = self.make_style('Unconfigured Gown', 'unconfigured-gown')
+        self.link_style(unconfigured, StyleFabric.Suitability.GOOD)
+
+        response = self.client.post(self.endpoint, self.request_data(), format='json')
+
+        self.assertEqual(response.status_code, 200)
+        results = {item['style_id']: item for item in response.data['results']}
+        self.assertIn(draft.pk, results)
+        self.assertEqual(results[draft.pk]['measurement_check']['status'], 'draft')
+        self.assertEqual(results[draft.pk]['score'], 100.0)
+        self.assertEqual(
+            results[unconfigured.pk]['measurement_check']['status'],
+            'not_configured',
+        )
+        self.assertEqual(response.data['excluded_for_measurements'], [])
+
+    def test_drafting_only_measurements_do_not_affect_recommendation_completeness(self):
+        drafting_style = self.make_style(
+            'Drafting Only Gown',
+            'drafting-only-gown',
+            measurement_specification_status=Style.MeasurementSpecificationStatus.REVIEWED,
+        )
+        self.link_style(drafting_style, StyleFabric.Suitability.EXCELLENT)
+        waist, _ = MeasurementType.objects.get_or_create(
+            code='waist',
+            defaults={'name': 'Waist', 'category': 'torso'},
+        )
+        StyleMeasurementRequirement.objects.create(
+            style=drafting_style,
+            measurement_type=waist,
+            purpose=StyleMeasurementRequirement.Purpose.DRAFTING,
+        )
+
+        response = self.client.post(self.endpoint, self.request_data(), format='json')
+
+        result = next(
+            item for item in response.data['results'] if item['style_id'] == drafting_style.pk
+        )
+        self.assertEqual(result['measurement_check']['status'], 'no_recommendation_requirements')
+        self.assertEqual(result['missing_measurements'], [])
+        self.assertEqual(result['score'], 100.0)
+
+    def test_conditional_requirements_are_returned_without_automatic_evaluation(self):
+        waist, _ = MeasurementType.objects.get_or_create(
+            code='waist',
+            defaults={'name': 'Waist', 'category': 'torso'},
+        )
+        StyleMeasurementRequirement.objects.create(
+            style=self.style,
+            measurement_type=waist,
+            condition='Only if the selected design includes a fitted waist.',
+        )
+
+        response = self.client.post(self.endpoint, self.request_data(), format='json')
+
+        result = response.data['results'][0]
+        self.assertEqual(result['measurement_check']['status'], 'conditional_unresolved')
+        self.assertEqual(
+            result['measurement_check']['conditional_requirements'],
+            [{
+                'code': 'waist',
+                'name': 'Waist',
+                'condition': 'Only if the selected design includes a fitted waist.',
+            }],
+        )
+        self.assertTrue(any('not evaluated automatically' in reason for reason in result['reasons']))
+
+    def test_fabric_compatibility_evidence_includes_suitability_and_notes(self):
+        link = self.style.fabric_links.get()
+        link.notes = 'Suitable for a lightweight finish.'
+        link.save(update_fields=['notes'])
+
+        response = self.client.post(self.endpoint, self.request_data(), format='json')
+
+        compatibility = response.data['results'][0]['fabric_compatibility']
+        self.assertEqual(compatibility['suitability'], StyleFabric.Suitability.EXCELLENT)
+        self.assertEqual(compatibility['notes'], 'Suitable for a lightweight finish.')
+
+    def test_validated_specification_is_identified_in_measurement_check(self):
+        validated = self.make_style(
+            'Validated Gown',
+            'validated-gown',
+            measurement_specification_status=Style.MeasurementSpecificationStatus.VALIDATED,
+        )
+        self.link_style(validated, StyleFabric.Suitability.GOOD)
+        StyleMeasurementRequirement.objects.create(
+            style=validated,
+            measurement_type=self.bust,
+        )
+
+        response = self.client.post(self.endpoint, self.request_data(), format='json')
+
+        result = next(
+            item for item in response.data['results'] if item['style_id'] == validated.pk
+        )
+        self.assertEqual(result['measurement_check']['status'], 'complete')
+        self.assertEqual(
+            result['measurement_check']['specification_status'],
+            Style.MeasurementSpecificationStatus.VALIDATED,
+        )
+
+    def test_style_api_cannot_change_measurement_review_status(self):
+        response = self.client.patch(
+            f'/api/v1/styles/{self.style.pk}/',
+            {'measurement_specification_status': Style.MeasurementSpecificationStatus.VALIDATED},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.style.refresh_from_db()
+        self.assertEqual(
+            self.style.measurement_specification_status,
+            Style.MeasurementSpecificationStatus.REVIEWED,
+        )

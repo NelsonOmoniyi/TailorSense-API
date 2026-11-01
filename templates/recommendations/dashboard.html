@@ -89,10 +89,15 @@
 {% if recommendations %}
     {% if recommendations.missing_measurements %}
         <div class="alert alert-info" role="status">
-            Some matching styles were omitted because required measurements are missing:
-            {% for measurement in recommendations.missing_measurements %}
-                {{ measurement.name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}.
+            Some matching styles were omitted because their reviewed checklist has missing required measurements.
+            {% for style in recommendations.excluded_for_measurements %}
+                <div class="mt-2"><strong>{{ style.name }}</strong>
+                    ({{ style.measurement_check.specification_status|title }} checklist):
+                    {% for measurement in style.missing_measurements %}
+                        {{ measurement.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
 
@@ -115,16 +120,37 @@
                             {% endwith %}
                             <p class="workspace-page-kicker mb-1">SCORE {{ result.score|floatformat:1 }}/100</p>
                             <h3>{{ result.name }}</h3>
+                            <p><strong>Recorded fabric suitability:</strong> {{ result.fabric_compatibility.suitability|title }}</p>
                             {% if result.description %}<p>{{ result.description }}</p>{% endif %}
+                            <p><strong>Measurement checklist:</strong>
+                                {% if result.measurement_check.status == 'not_configured' %}Not configured
+                                {% elif result.measurement_check.status == 'no_recommendation_requirements' %}No recommendation checklist
+                                {% elif result.measurement_check.status == 'conditional_unresolved' %}Conditional review needed
+                                {% elif result.measurement_check.status == 'optional_missing' %}Optional measurements missing
+                                {% elif result.measurement_check.status == 'complete' %}Checklist complete (not a fit guarantee)
+                                {% elif result.measurement_check.status == 'draft' %}Draft checklist
+                                {% else %}{{ result.measurement_check.status|title }}
+                                {% endif %}
+                            </p>
                             <ul class="mb-0">
                                 {% for reason in result.reasons %}<li>{{ reason }}</li>{% endfor %}
                             </ul>
                             {% if result.missing_measurements %}
-                                <p class="mt-3 mb-0"><strong>Optional measurements not recorded:</strong>
+                                <p class="mt-3 mb-0"><strong>Checklist measurements not recorded:</strong>
                                     {% for measurement in result.missing_measurements %}
-                                        {{ measurement.name }}{% if not forloop.last %}, {% endif %}
+                                        {{ measurement.name }}{% if measurement.instructions %} ({{ measurement.instructions }}){% endif %}{% if not forloop.last %}, {% endif %}
                                     {% endfor %}
                                 </p>
+                            {% endif %}
+                            {% if result.measurement_check.conditional_requirements %}
+                                <div class="mt-3">
+                                    <strong>Conditional measurements need manual review:</strong>
+                                    <ul class="mb-0">
+                                        {% for measurement in result.measurement_check.conditional_requirements %}
+                                            <li>{{ measurement.name }}: {{ measurement.condition }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             {% endif %}
                         </article>
                     </div>
@@ -133,7 +159,7 @@
         {% else %}
             <div class="workspace-panel workspace-empty-state">
                 <h3>No eligible styles found</h3>
-                <p>No active style has a recorded suitable link to this fabric and category with the required measurements available.</p>
+                <p>No active style matched the selected fabric and category with the recorded compatibility and reviewed measurement checks.</p>
             </div>
         {% endif %}
     </section>

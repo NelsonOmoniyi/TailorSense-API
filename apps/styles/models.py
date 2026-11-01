@@ -1,5 +1,6 @@
 """Style catalogue and links to the shared fabric and measurement catalogues."""
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -36,6 +37,12 @@ class Occasion(models.Model):
 class Style(models.Model):
     """A design in the style catalogue."""
 
+    class MeasurementSpecificationStatus(models.TextChoices):
+        NOT_CONFIGURED = 'not_configured', 'Not configured'
+        DRAFT = 'draft', 'Draft'
+        REVIEWED = 'reviewed', 'Reviewed'
+        VALIDATED = 'validated', 'Validated in practice'
+
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=255)
     garment = models.ForeignKey(Garment, on_delete=models.PROTECT, related_name='styles')
@@ -47,6 +54,16 @@ class Style(models.Model):
     occasions = models.ManyToManyField(Occasion, related_name='styles', blank=True)
     complexity = models.CharField(max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
+    measurement_specification_status = models.CharField(
+        max_length=20,
+        choices=MeasurementSpecificationStatus.choices,
+        default=MeasurementSpecificationStatus.NOT_CONFIGURED,
+    )
+    measurement_specification_source = models.TextField(blank=True)
+    measurement_specification_reviewed_by = models.CharField(max_length=150, blank=True)
+    measurement_specification_reviewed_at = models.DateTimeField(blank=True, null=True)
+    measurement_specification_validated_by = models.CharField(max_length=150, blank=True)
+    measurement_specification_validated_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -58,6 +75,38 @@ class Style(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        reviewed_statuses = {
+            self.MeasurementSpecificationStatus.REVIEWED,
+            self.MeasurementSpecificationStatus.VALIDATED,
+        }
+        if self.measurement_specification_status in reviewed_statuses:
+            if not self.measurement_specification_source.strip():
+                errors['measurement_specification_source'] = (
+                    'Add the source used to review this measurement specification.'
+                )
+            if not self.measurement_specification_reviewed_by.strip():
+                errors['measurement_specification_reviewed_by'] = (
+                    'Record who reviewed this measurement specification.'
+                )
+            if self.measurement_specification_reviewed_at is None:
+                errors['measurement_specification_reviewed_at'] = (
+                    'Record when this measurement specification was reviewed.'
+                )
+        if self.measurement_specification_status == self.MeasurementSpecificationStatus.VALIDATED:
+            if not self.measurement_specification_validated_by.strip():
+                errors['measurement_specification_validated_by'] = (
+                    'Record who validated this measurement specification in practice.'
+                )
+            if self.measurement_specification_validated_at is None:
+                errors['measurement_specification_validated_at'] = (
+                    'Record when this measurement specification was validated in practice.'
+                )
+        if errors:
+            raise ValidationError(errors)
 
 
 class StyleImage(models.Model):
@@ -113,11 +162,19 @@ class StyleFabric(models.Model):
 class StyleMeasurementRequirement(models.Model):
     """Measurement types needed to construct a design; stores no body values."""
 
+    class Purpose(models.TextChoices):
+        RECOMMENDATION = 'recommendation', 'Recommendation completeness'
+        DRAFTING = 'drafting', 'Pattern drafting'
+        BOTH = 'both', 'Recommendation and drafting'
+
     style = models.ForeignKey(Style, on_delete=models.CASCADE, related_name='measurement_requirements')
     measurement_type = models.ForeignKey(
         'measurements.MeasurementType', on_delete=models.PROTECT, related_name='style_requirements'
     )
     is_required = models.BooleanField(default=True)
+    purpose = models.CharField(max_length=20, choices=Purpose.choices, default=Purpose.BOTH)
+    instructions = models.TextField(blank=True)
+    condition = models.TextField(blank=True)
     notes = models.TextField(blank=True)
     display_order = models.PositiveIntegerField(default=0)
 

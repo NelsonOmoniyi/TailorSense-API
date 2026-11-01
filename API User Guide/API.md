@@ -125,10 +125,24 @@ Illustrative successful response (IDs, score, descriptions, and image URLs depen
       "score": 91.1,
       "reasons": [
         "The recorded fabric suitability for this style is good.",
-        "All recorded measurement requirements are available.",
+        "All reviewed recommendation measurements are available.",
         "The profile and style have matching recorded sizing categories.",
         "This style is associated with the selected Casual occasion."
       ],
+      "fabric_compatibility": {
+        "suitability": "good",
+        "notes": "Suitable for a lightweight finish."
+      },
+      "measurement_check": {
+        "status": "complete",
+        "specification_status": "reviewed",
+        "required_count": 2,
+        "required_available_count": 2,
+        "optional_count": 0,
+        "optional_available_count": 0,
+        "missing_measurements": [],
+        "conditional_requirements": []
+      },
       "missing_measurements": [],
       "images": [
         {
@@ -144,6 +158,7 @@ Illustrative successful response (IDs, score, descriptions, and image URLs depen
     }
   ],
   "missing_measurements": [],
+  "excluded_for_measurements": [],
   "count": 1
 }
 ```
@@ -153,14 +168,17 @@ Illustrative successful response (IDs, score, descriptions, and image URLs depen
 - Only active styles in the selected active garment category with an active style/fabric relationship are considered.
 - `unsuitable` and inactive relationships are excluded. A missing relationship is not treated as compatibility.
 - If both the profile and style have a sizing-category value and those values differ, the style is excluded. If either is blank, the style may be listed, but its reason explicitly states that sizing-category compatibility could not be verified.
-- A style missing any required measurement is excluded. The response-level `missing_measurements` lists the distinct missing codes and names among otherwise matching candidates. Missing optional measurements are retained in that style's result and lower its measurement-completeness score.
-- Fabric scores are `excellent` 100, `good` 80, and `acceptable` 60. Measurement completeness is calculated from recorded style requirements when present. A requested occasion contributes 100 when associated and 0 otherwise.
+- Measurement specification states are `not_configured`, `draft`, `reviewed`, and `validated`. Only reviewed or validated specifications can gate eligibility or contribute to measurement-completeness scoring. Styles without an approved specification remain possible candidates, but their measurement readiness is explicitly unknown and does not receive a completeness score.
+- A style is excluded for missing required measurements only when those requirements belong to a reviewed/validated specification and are for recommendation completeness (`recommendation` or `both`). The response-level `missing_measurements` lists distinct missing required codes/names across excluded matching styles; `excluded_for_measurements` identifies each excluded style, its `incomplete` check status, and its reviewed specification state. Missing optional recommendation measurements are retained in results and reduce completeness.
+- Requirements marked `drafting` do not affect recommendations. Conditional requirements are returned with their condition and are marked unresolved; the API does not interpret free text or decide whether the condition applies.
+- Result `measurement_check.status` may be `not_configured`, `draft`, `complete`, `optional_missing`, `conditional_unresolved`, or `no_recommendation_requirements`. Excluded styles have `measurement_check.status` set to `incomplete`. The result includes required/optional checklist counts, available counts, missing measurements, and conditional requirements. A `complete` checklist means only that the reviewed recommendation checklist's applicable measurements are recorded; it is not a fit assessment.
+- Fabric scores are `excellent` 100, `good` 80, and `acceptable` 60. Each result includes `fabric_compatibility.suitability` and the stored link notes. Measurement completeness is calculated only from reviewed/validated recommendation requirements. A requested occasion contributes 100 when associated and 0 otherwise.
 - The provisional weights are fabric 40, measurements 30, and occasion 20. Unavailable criteria are omitted and the remaining weights are normalized. The score is rounded to one decimal place; ties are broken by style name and ID.
 - Results include the existing ordered StyleImage records, with primary images first. A style appears only once.
 
 Validation errors return `400`; this includes unknown profile/fabric/category/occasion values, a profile not owned by the caller, unsupported preferences, and limits outside 1–20. Authentication failures return the project's DRF permission response (`401` or `403`, depending on the authentication class). A valid request with no eligible styles returns `200` with `results: []` and `count: 0`.
 
-The recommendations dashboard at `/recommendations/` uses the same API. Scores describe recorded catalogue compatibility, not a guaranteed fit or pattern draft. Fabric records have no owner or quantity, and styles have no material-consumption estimates; the API does not claim the user owns enough fabric to make a style. Recommendation history and unsupported user preferences are not implemented.
+The recommendations dashboard at `/recommendations/` uses the same API. Scores describe recorded catalogue compatibility and checklist completeness, not a guaranteed fit, validated pattern draft, or body-shape assessment. Fabric records have no owner or quantity, and styles have no material-consumption estimates; the API does not claim the user owns enough fabric to make a style. Recommendation history and unsupported user preferences are not implemented.
 
 ## How the fabric API is used
 

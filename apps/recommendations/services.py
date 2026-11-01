@@ -41,10 +41,10 @@ def get_recommendations(profile, fabric, category, occasion=None, limit=10):
     measurement_type_ids = set(
         profile.measurements.values_list('measurement_type_id', flat=True)
     )
-    ranked, missing_required = rank_styles(
+    ranked, missing_required, excluded_for_measurements = rank_styles(
         styles,
         measurement_type_ids,
         profile_gender=profile.gender,
         occasion=occasion,
     )
-    return ranked[:limit], missing_required
+    return ranked[:limit], missing_required, excluded_for_measurements

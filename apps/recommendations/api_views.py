@@ -20,7 +20,7 @@ class RecommendationView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         values = serializer.validated_data
-        results, missing_measurements = get_recommendations(
+        results, missing_measurements, excluded_styles = get_recommendations(
             profile=values['measurement_profile_id'],
             fabric=values['fabric_id'],
             category=values['category'],
@@ -32,9 +32,19 @@ class RecommendationView(APIView):
             many=True,
             context={'request': request},
         ).data
+        excluded_for_measurements = [
+            {
+                'style_id': item['style'].pk,
+                'name': item['style'].name,
+                'measurement_check': item['measurement_check'],
+                'missing_measurements': item['missing_measurements'],
+            }
+            for item in excluded_styles
+        ]
         return Response({
             'category': values['category'].slug,
             'results': serialized_results,
             'missing_measurements': missing_measurements,
+            'excluded_for_measurements': excluded_for_measurements,
             'count': len(serialized_results),
         }, status=status.HTTP_200_OK)

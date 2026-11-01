@@ -52,5 +52,7 @@ class RecommendationResultSerializer(serializers.Serializer):
     description = serializers.CharField(source='style.description')
     score = serializers.FloatField()
     reasons = serializers.ListField(child=serializers.CharField())
+    fabric_compatibility = serializers.DictField()
     missing_measurements = serializers.ListField(child=serializers.DictField())
+    measurement_check = serializers.DictField()
     images = StyleImageSerializer(source='style.images', many=True)

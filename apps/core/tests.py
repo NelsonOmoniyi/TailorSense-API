@@ -236,11 +236,26 @@ class RecommendationsDashboardTests(TestCase):
                 'category': 'gowns',
                 'count': 1,
                 'missing_measurements': [],
+                'excluded_for_measurements': [],
                 'results': [{
                     'name': 'Flare Gown',
                     'score': 95.0,
                     'description': 'A sample style.',
                     'reasons': ['A recorded fabric link supports this style.'],
+                    'fabric_compatibility': {
+                        'suitability': 'good',
+                        'notes': 'Suitable for a lightweight finish.',
+                    },
+                    'measurement_check': {
+                        'status': 'not_configured',
+                        'specification_status': 'not_configured',
+                        'required_count': 0,
+                        'required_available_count': 0,
+                        'optional_count': 0,
+                        'optional_available_count': 0,
+                        'missing_measurements': [],
+                        'conditional_requirements': [],
+                    },
                     'images': [],
                     'missing_measurements': [],
                 }],
@@ -257,6 +272,8 @@ class RecommendationsDashboardTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Flare Gown')
         self.assertContains(response, '95.0/100')
+        self.assertContains(response, 'Not configured')
+        self.assertContains(response, 'Recorded fabric suitability')
         self.assertTemplateUsed(response, 'recommendations/dashboard.html')
         self.assertTrue(mock_post.call_args.args[0].endswith('/api/v1/recommendations/'))
         self.assertEqual(mock_post.call_args.kwargs['json'], {
