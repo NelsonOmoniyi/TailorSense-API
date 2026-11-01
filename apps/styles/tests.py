@@ -46,7 +46,7 @@ class MeasurementSpecificationValidationTests(TestCase):
             },
         )
 
-    def test_agbada_pilot_is_seeded_as_draft_with_source_and_conditions(self):
+    def test_agbada_pilot_is_reviewed_with_source_and_resolved_conditions(self):
         style = Style.objects.get(garment__slug='agbada', slug='classic-agbada')
         agbada_styles = Style.objects.filter(garment__slug='agbada', is_active=True)
         requirements = {
@@ -58,15 +58,23 @@ class MeasurementSpecificationValidationTests(TestCase):
 
         self.assertEqual(
             style.measurement_specification_status,
-            Style.MeasurementSpecificationStatus.DRAFT,
+            Style.MeasurementSpecificationStatus.REVIEWED,
+        )
+        self.assertEqual(
+            style.measurement_specification_reviewed_by,
+            'Nelson Omoniyi - Board of Trustees, TairlorSense LTD',
+        )
+        self.assertEqual(
+            style.measurement_specification_reviewed_at.date().isoformat(),
+            '2026-11-01',
         )
         self.assertEqual(agbada_styles.count(), 12)
         self.assertTrue(all(
-            item.measurement_specification_status == Style.MeasurementSpecificationStatus.DRAFT
+            item.measurement_specification_status == Style.MeasurementSpecificationStatus.REVIEWED
             and item.measurement_requirements.count() == 12
             for item in agbada_styles
         ))
-        self.assertIn('User-supplied Agbada checklist', style.measurement_specification_source)
+        self.assertIn('User-provided Agbada checklist', style.measurement_specification_source)
         self.assertEqual(len(requirements), 12)
         self.assertTrue(requirements['agbada_length'].is_required)
         self.assertEqual(
@@ -75,14 +83,16 @@ class MeasurementSpecificationValidationTests(TestCase):
         )
         self.assertEqual(
             requirements['thigh_circumference'].condition,
-            'Only if the style includes Sokoto Kembe (three-quarter, loose).',
+            '',
         )
         self.assertEqual(
             requirements['embroidery_area_width'].condition,
-            'Only if the style includes custom chest embroidery.',
+            '',
         )
         self.assertEqual(
             requirements['embroidery_area_depth'].condition,
-            requirements['embroidery_area_width'].condition,
+            '',
         )
+        self.assertIn('all active Agbada styles include this feature', requirements['thigh_circumference'].notes)
+        self.assertIn('all active Agbada styles include this feature', requirements['embroidery_area_width'].notes)
         self.assertFalse(requirements['fila_head_circumference'].is_required)

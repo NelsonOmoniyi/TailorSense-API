@@ -407,6 +407,43 @@ class RecommendationsApiTests(APITestCase):
             Style.MeasurementSpecificationStatus.VALIDATED,
         )
 
+    def test_reviewed_agbada_checklist_gates_on_required_entries_and_scores_optional(self):
+        style = Style.objects.get(garment__slug='agbada', slug='classic-agbada')
+        profile = MeasurementProfile.objects.create(
+            user=self.user,
+            name='Agbada Checklist',
+            gender=style.gender,
+            unit='cm',
+        )
+        self.link_style(style, StyleFabric.Suitability.EXCELLENT)
+        required_types = [
+            item.measurement_type
+            for item in style.measurement_requirements.filter(is_required=True)
+        ]
+        for measurement_type in required_types:
+            Measurement.objects.create(
+                profile=profile,
+                measurement_type=measurement_type,
+                value='100.00',
+                unit='cm',
+            )
+
+        response = self.client.post(
+            self.endpoint,
+            self.request_data(measurement_profile_id=profile.pk, category='agbada'),
+            format='json',
+        )
+
+        result = next(
+            item for item in response.data['results'] if item['style_id'] == style.pk
+        )
+        self.assertEqual(result['measurement_check']['status'], 'optional_missing')
+        self.assertEqual(result['measurement_check']['required_count'], 11)
+        self.assertEqual(result['measurement_check']['required_available_count'], 11)
+        self.assertEqual(result['measurement_check']['optional_count'], 1)
+        self.assertEqual(result['missing_measurements'][0]['code'], 'fila_head_circumference')
+        self.assertEqual(result['score'], 96.4)
+
     def test_style_api_cannot_change_measurement_review_status(self):
         response = self.client.patch(
             f'/api/v1/styles/{self.style.pk}/',

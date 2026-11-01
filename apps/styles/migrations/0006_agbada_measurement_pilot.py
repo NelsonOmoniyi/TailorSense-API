@@ -163,7 +163,7 @@ def seed_agbada_measurements(apps, schema_editor):
         style.measurement_specification_status = 'draft'
         if not style.measurement_specification_source:
             style.measurement_specification_source = (
-                'User-supplied Agbada checklist; see each requirement note for its source.'
+                'User-provided Agbada checklist; see each requirement note for its source.'
             )
         style.save(
             using=database,
