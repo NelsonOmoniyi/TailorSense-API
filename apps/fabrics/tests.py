@@ -61,7 +61,8 @@ class FabricApiTests(TestCase):
         self.assertTrue(Fabric.objects.filter(fabric_name='Cotton Poplin').exists())
 
     def test_add_fabric_api_rejects_invalid_property_level(self):
+        fabric_count = Fabric.objects.count()
         response = self.client.post('/api/fabrics/add/', {**self.payload, 'stretch': 'very-high'})
 
         self.assertEqual(response.status_code, 400)
-        self.assertFalse(Fabric.objects.exists())
+        self.assertEqual(Fabric.objects.count(), fabric_count)

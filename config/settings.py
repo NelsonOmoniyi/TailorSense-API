@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.fabrics',
     'apps.measurements',
     'apps.styles',
+    'apps.recommendations',
 ]
 
 MIDDLEWARE = [

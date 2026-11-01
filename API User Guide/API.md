@@ -88,6 +88,80 @@ The API creates the profile for the authenticated user and stores each entry as 
 
 > **Note on units:** Tailoring measurements are all linear, so `cm` and `in` are the only accepted units. Body weight was removed deliberately — a tape measure cannot capture mass and no pattern draft uses it.
 
+### 6. Recommendations API
+
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `POST` | `/api/v1/recommendations/` | Valid project session or JWT | Rank active styles for a profile, fabric, and garment category |
+
+The measurement profile must belong to the authenticated user. The selected fabric is an existing record in the shared catalogue. `category` is the slug of an active garment returned by `/api/v1/garments/`. An optional `occasion` must match an existing occasion name (case-insensitive). `limit` is optional, defaults to 10, and must be between 1 and 20. Unsupported keys, including `preferences`, are rejected.
+
+```http
+POST /api/v1/recommendations/
+Content-Type: application/json
+Cookie: sessionid=your-session-cookie
+```
+
+```json
+{
+  "measurement_profile_id": 12,
+  "fabric_id": 7,
+  "category": "gowns",
+  "occasion": "casual",
+  "limit": 10
+}
+```
+
+Illustrative successful response (IDs, score, descriptions, and image URLs depend on actual records):
+
+```json
+{
+  "category": "gowns",
+  "results": [
+    {
+      "style_id": 24,
+      "name": "Flare Gown",
+      "description": "A style description from the catalogue.",
+      "score": 91.1,
+      "reasons": [
+        "The recorded fabric suitability for this style is good.",
+        "All recorded measurement requirements are available.",
+        "The profile and style have matching recorded sizing categories.",
+        "This style is associated with the selected Casual occasion."
+      ],
+      "missing_measurements": [],
+      "images": [
+        {
+          "id": 31,
+          "image": "http://127.0.0.1:8000/media/styles/flare-gown.jpg",
+          "view_type": "front",
+          "alt_text": "Front view of the gown",
+          "is_primary": true,
+          "display_order": 0,
+          "created_at": "2026-09-18T12:00:00Z"
+        }
+      ]
+    }
+  ],
+  "missing_measurements": [],
+  "count": 1
+}
+```
+
+#### Eligibility and ranking
+
+- Only active styles in the selected active garment category with an active style/fabric relationship are considered.
+- `unsuitable` and inactive relationships are excluded. A missing relationship is not treated as compatibility.
+- If both the profile and style have a sizing-category value and those values differ, the style is excluded. If either is blank, the style may be listed, but its reason explicitly states that sizing-category compatibility could not be verified.
+- A style missing any required measurement is excluded. The response-level `missing_measurements` lists the distinct missing codes and names among otherwise matching candidates. Missing optional measurements are retained in that style's result and lower its measurement-completeness score.
+- Fabric scores are `excellent` 100, `good` 80, and `acceptable` 60. Measurement completeness is calculated from recorded style requirements when present. A requested occasion contributes 100 when associated and 0 otherwise.
+- The provisional weights are fabric 40, measurements 30, and occasion 20. Unavailable criteria are omitted and the remaining weights are normalized. The score is rounded to one decimal place; ties are broken by style name and ID.
+- Results include the existing ordered StyleImage records, with primary images first. A style appears only once.
+
+Validation errors return `400`; this includes unknown profile/fabric/category/occasion values, a profile not owned by the caller, unsupported preferences, and limits outside 1–20. Authentication failures return the project's DRF permission response (`401` or `403`, depending on the authentication class). A valid request with no eligible styles returns `200` with `results: []` and `count: 0`.
+
+The recommendations dashboard at `/recommendations/` uses the same API. Scores describe recorded catalogue compatibility, not a guaranteed fit or pattern draft. Fabric records have no owner or quantity, and styles have no material-consumption estimates; the API does not claim the user owns enough fabric to make a style. Recommendation history and unsupported user preferences are not implemented.
+
 ## How the fabric API is used
 
 The signed-in dashboard flow is:

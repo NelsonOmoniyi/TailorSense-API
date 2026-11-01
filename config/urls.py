@@ -27,8 +27,8 @@ urlpatterns = [
     path('api/fabrics/', include('apps.fabrics.api_urls')),
     path('api/measurements/', include('apps.measurements.api_urls')),
     path('api/v1/', include('apps.styles.api_urls')),
+    path('api/v1/recommendations/', include('apps.recommendations.api_urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

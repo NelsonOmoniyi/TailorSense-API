@@ -496,12 +496,76 @@ def add_style(request):
 
 @authenticated_required
 def recommendations_dashboard(request):
-    """Render Recommendations UI from its own template under the shared base shell.
+    """Render recommendation choices and submit requests through the versioned API."""
+    options = {
+        'profiles': [],
+        'fabrics': [],
+        'garments': [],
+    }
+    error = None
+    for key, path in (
+        ('profiles', '/api/measurements/profiles/'),
+        ('fabrics', '/api/fabrics/list/'),
+        ('garments', '/api/v1/garments/'),
+    ):
+        try:
+            response = requests.get(
+                request.build_absolute_uri(path),
+                cookies=request.COOKIES,
+                timeout=10,
+            )
+        except requests.RequestException:
+            error = 'Recommendation options are temporarily unavailable. Please try again shortly.'
+            break
+        if response.status_code in {401, 403}:
+            return redirect('login')
+        if response.status_code != 200:
+            error = _api_error_message(response, 'Recommendation options are temporarily unavailable.')
+            break
+        items = response.json()
+        if not isinstance(items, list):
+            error = 'Recommendation options could not be loaded.'
+            break
+        options[key] = items
 
-    The future recommendation service can populate this page without moving
-    presentation back into Home or changing the shared navigation contract.
-    """
-    return render(request, 'recommendations/dashboard.html')
+    selected = {
+        'measurement_profile_id': request.POST.get('measurement_profile_id', ''),
+        'fabric_id': request.POST.get('fabric_id', ''),
+        'category': request.POST.get('category', ''),
+        'limit': request.POST.get('limit', '10'),
+    }
+    recommendations = None
+    if request.method == 'POST' and error is None:
+        payload = {
+            'measurement_profile_id': selected['measurement_profile_id'],
+            'fabric_id': selected['fabric_id'],
+            'category': selected['category'],
+            'limit': selected['limit'],
+        }
+        try:
+            response = requests.post(
+                request.build_absolute_uri('/api/v1/recommendations/'),
+                json=payload,
+                cookies=request.COOKIES,
+                headers=_api_headers(request),
+                timeout=15,
+            )
+        except requests.RequestException:
+            error = 'Recommendations are temporarily unavailable. Please try again shortly.'
+        else:
+            if response.status_code == 200:
+                recommendations = response.json()
+            elif response.status_code in {401, 403}:
+                return redirect('login')
+            else:
+                error = _api_error_message(response, 'We could not generate recommendations.')
+
+    return render(request, 'recommendations/dashboard.html', {
+        **options,
+        'error': error,
+        'recommendations': recommendations,
+        'selected': selected,
+    })
 
 
 @authenticated_required

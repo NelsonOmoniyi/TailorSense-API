@@ -3,29 +3,139 @@
 {% block title %}Recommendations | TailorSense{% endblock %}
 
 {% block content %}
-<!-- Recommendations page. Currently an intentional empty state; results will come
-     from the recommendations engine once it exists. -->
 <header class="workspace-page-heading">
     <div>
         <p class="workspace-page-kicker">PERSONALIZED IDEAS</p>
         <h1>Recommendations</h1>
-        <p>Suggestions based on your profile and fabrics.</p>
+        <p>Explore active styles using your measurements and a selected fabric.</p>
     </div>
 </header>
 
-<section class="workspace-panel catalog-empty-panel" aria-labelledby="recommendation-list-title">
+{% if error %}
+    <div class="alert alert-warning" role="alert">{{ error }}</div>
+{% endif %}
+
+<section class="workspace-panel mb-4" aria-labelledby="recommendation-request-title">
     <div class="workspace-panel-heading">
         <div>
-            <h2 id="recommendation-list-title">Suggestions for you</h2>
-            <p>Style suggestions based on your measurements and fabrics.</p>
+            <h2 id="recommendation-request-title">Find a style</h2>
+            <p>Results use recorded fabric suitability and measurement requirements; they do not guarantee fit or fabric quantity.</p>
         </div>
-        <span class="workspace-filter-label"><i class="bi bi-sliders" aria-hidden="true"></i> All</span>
     </div>
-    <div class="workspace-empty-state">
-        <i class="bi bi-lightbulb" aria-hidden="true"></i>
-        <h2>Recommendations are not ready yet</h2>
-        <p>Add measurements and style preferences to prepare this section.</p>
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'measurements' %}">Open measurements</a>
-    </div>
+    {% if profiles and fabrics and garments %}
+        <form method="post" action="{% url 'recommendations' %}" class="row g-3 align-items-end">
+            {% csrf_token %}
+            <div class="col-12 col-md-6 col-xl-3">
+                <label class="form-label" for="recommendation-profile">Measurement profile</label>
+                <select class="form-select" id="recommendation-profile" name="measurement_profile_id" required>
+                    <option value="">Choose a profile</option>
+                    {% for profile in profiles %}
+                        <option value="{{ profile.id }}" {% if selected.measurement_profile_id == profile.id|stringformat:'s' %}selected{% endif %}>
+                            {{ profile.name }}{% if profile.gender %} · {{ profile.gender|title }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <label class="form-label" for="recommendation-fabric">Fabric</label>
+                <select class="form-select" id="recommendation-fabric" name="fabric_id" required>
+                    <option value="">Choose a fabric</option>
+                    {% for fabric in fabrics %}
+                        <option value="{{ fabric.id }}" {% if selected.fabric_id == fabric.id|stringformat:'s' %}selected{% endif %}>
+                            {{ fabric.fabric_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <label class="form-label" for="recommendation-category">Garment category</label>
+                <select class="form-select" id="recommendation-category" name="category" required>
+                    <option value="">Choose a category</option>
+                    {% for garment in garments %}
+                        <option value="{{ garment.slug }}" {% if selected.category == garment.slug %}selected{% endif %}>
+                            {{ garment.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-xl-1">
+                <label class="form-label" for="recommendation-limit">Results</label>
+                <input class="form-control" id="recommendation-limit" name="limit" type="number" min="1" max="20" value="{{ selected.limit|default:'10' }}" required>
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <button class="btn btn-primary w-100" type="submit">Get recommendations</button>
+            </div>
+        </form>
+    {% elif error %}
+        <p class="mb-0">Recommendation options could not be loaded.</p>
+    {% else %}
+        <div class="workspace-empty-state py-4">
+            {% if not profiles %}
+                <h3>No measurement profiles yet</h3>
+                <p>Add a profile before requesting measurement-aware recommendations.</p>
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'measurements' %}">Open measurements</a>
+            {% elif not fabrics %}
+                <h3>No fabrics are available</h3>
+                <p>Add or select a fabric before requesting recommendations.</p>
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'fabrics-dashboard' %}">Open fabrics</a>
+            {% else %}
+                <h3>No garment categories are available</h3>
+                <p>Active categories from the style catalogue will appear here.</p>
+            {% endif %}
+        </div>
+    {% endif %}
 </section>
+
+{% if recommendations %}
+    {% if recommendations.missing_measurements %}
+        <div class="alert alert-info" role="status">
+            Some matching styles were omitted because required measurements are missing:
+            {% for measurement in recommendations.missing_measurements %}
+                {{ measurement.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}.
+        </div>
+    {% endif %}
+
+    <section aria-labelledby="recommendation-results-title">
+        <div class="workspace-panel-heading mb-3">
+            <div>
+                <h2 id="recommendation-results-title">Suggested styles</h2>
+                <p>{{ recommendations.count }} result{{ recommendations.count|pluralize }}</p>
+            </div>
+        </div>
+        {% if recommendations.results %}
+            <div class="row g-3">
+                {% for result in recommendations.results %}
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <article class="workspace-panel h-100">
+                            {% with image=result.images.0 %}
+                                {% if image.image %}
+                                    <img class="img-fluid rounded mb-3" src="{{ image.image }}" alt="{{ image.alt_text|default:result.name }}" loading="lazy">
+                                {% endif %}
+                            {% endwith %}
+                            <p class="workspace-page-kicker mb-1">SCORE {{ result.score|floatformat:1 }}/100</p>
+                            <h3>{{ result.name }}</h3>
+                            {% if result.description %}<p>{{ result.description }}</p>{% endif %}
+                            <ul class="mb-0">
+                                {% for reason in result.reasons %}<li>{{ reason }}</li>{% endfor %}
+                            </ul>
+                            {% if result.missing_measurements %}
+                                <p class="mt-3 mb-0"><strong>Optional measurements not recorded:</strong>
+                                    {% for measurement in result.missing_measurements %}
+                                        {{ measurement.name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="workspace-panel workspace-empty-state">
+                <h3>No eligible styles found</h3>
+                <p>No active style has a recorded suitable link to this fabric and category with the required measurements available.</p>
+            </div>
+        {% endif %}
+    </section>
+{% endif %}
 {% endblock %}
