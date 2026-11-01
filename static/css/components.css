@@ -1,1 +1,64 @@
 /* I will be moving all reusable components to this file and updating reference to them across the landing page-authentication pages */
+
+/* TAILORSENSE — SHARED COMPONENTS */
+
+/* BRAND LOGO */
+
+.login-brand img,
+.register-brand img,
+.brand-logo {
+    display: block;
+    width: 245px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Page-specific logo sizing remains in page CSS. */
+
+
+/* BACK TO HOME LINK */
+
+.back-home {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 16px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.back-home:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.back-home2 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 18px;
+    color: #fff;
+    background: #74255f;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(36, 24, 47, 0.18);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.back-home2:hover {
+    color: #fff;
+    background: #5d1c4b;
+    transform: translateY(-1px);
+}
+

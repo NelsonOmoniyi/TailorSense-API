@@ -15,52 +15,7 @@
     z-index: 10;
 }
 
-
-/* Brand */
-
-.login-brand {
-     display: block;
-}
-
-.login-brand img {
-    width: 245px;
-    height: auto;
-
-    display: block;
-}
-
-
-/* Back to home */
-
-.back-home {
-    padding: 9px 16px;
-
-    color: #ffffff;
-
-    font-size: 14px;
-    font-weight: 500;
-
-    text-decoration: none;
-
-    background: rgba(255, 255, 255, 0.12);
-
-    border: 1px solid rgba(255, 255, 255, 0.2);
-
-    border-radius: 20px;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
-}
-
-.back-home:hover {
-    background: rgba(255, 255, 255, 0.2);
-
-    transform: translateY(-1px);
-}/* =========================================
+/* =========================================
    LOGIN PAGE
    ========================================= */
 

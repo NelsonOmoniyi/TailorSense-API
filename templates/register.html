@@ -1,41 +1,152 @@
 <!-- Public registration page. Posts to the register route, which relays account
      creation to the user API (apps/core/views.py:register). Phone is required
      here and is stored on the user's profile. -->
- {% include 'partials/head.html' %}
 
 <!-- Registration form for new users. -->
-<main>
-    <h1>Create An Account With Us</h1>
-    {% if error %}
-        <p role="alert">{{ error }}</p>
-    {% endif %}
-    <!-- New account details are submitted to the named registration route. -->
-    <form action="{% url 'register' %}" method="post">
-        {% csrf_token %}
-        <div>
-            <label for="fullname">Full Name:</label> 
-            <input type="text" id="fullname" name="fullname" required maxlength="20">
-        </div>
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div>
-            <label for="phone">Phone Number:</label>
-            <input type="number" id="phone" name="phone" required maxlength="11">
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required maxlength="20" minlength="8">
-        </div>
-        <div>
-            <label for="repeat-password">Re-Enter Password:</label>
-            <input type="password" id="repeat-password" name="repeat_password" required maxlength="20" minlength="8">
-        </div>
-        <button type="submit">Sign Up</button>
-    </form>
-    <!-- Direct existing users to the login page. -->
-    <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
-</main>
+{% load static %}
+{% include 'partials/head.html' %}
 
- {% include 'partials/footer.html' %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+
+<div class="register-layout">
+
+    <header class="register-header">
+        <a href="/" class="register-brand">
+            <img
+                src="{% static 'images/tailorsense-logo.png' %}"
+                alt="TailorSense"
+            >
+        </a>
+
+        <a href="/" class="back-home2">
+            ← Back to home
+        </a>
+    </header>
+
+    <main class="register-page">
+
+        <section class="register-content">
+
+            <div class="register-visual">
+
+
+                <div class="register-intro">
+                    <p class="register-eyebrow">YOUR STYLE. YOUR VISION.</p>
+
+                    <h1>
+                        Your creativity deserves a place
+                        <span>to begin.</span>
+                    </h1>
+
+                    <p>
+                        Join TailorSense and start creating styles that fit your vision.
+                    </p>
+                </div>
+            </div>
+
+            <div class="register-card">
+
+                <div class="register-card-heading">
+                    <p class="register-kicker">
+                        GET STARTED WITH TAILORSENSE
+                    </p>
+
+                    <h2>Create Your Account</h2>
+
+                    <p>
+                        Join us and start creating styles that fit your vision.
+                    </p>
+                </div>
+
+                {% if error %}
+                    <p class="register-error" role="alert">
+                        {{ error }}
+                    </p>
+                {% endif %}
+
+                <form action="{% url 'register' %}" method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="fullname">Full name</label>
+                        <input
+                            type="text"
+                            id="fullname"
+                            name="fullname"
+                            placeholder="Enter your full name"
+                            required
+                            autocomplete="name"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone number</label>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="Enter your phone number"
+                            required
+                            maxlength="11"
+                            pattern="[0-9]{1,11}"
+                            inputmode="numeric"
+                            autocomplete="tel"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            required
+                            autocomplete="new-password"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="repeat-password">Confirm password</label>
+                        <input
+                            type="password"
+                            id="repeat-password"
+                            name="repeat_password"
+                            placeholder="Enter your password again"
+                            required
+                            autocomplete="new-password"
+                        >
+                    </div>
+
+                    <button type="submit" class="register-button">
+                        Create Account
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </form>
+
+                <p class="login-text">
+                    Already have an account?
+                    <a href="{% url 'login' %}">Log in</a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+</div>

@@ -1,0 +1,274 @@
+/* =========================
+   REGISTRATION PAGE
+========================= */
+
+.register-layout {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--cream);
+    color: var(--ink);
+}
+
+.register-layout::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: url("../images/register-atelier.png");
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: cover;
+}
+
+.register-layout *,
+.register-layout *::before,
+.register-layout *::after {
+    box-sizing: border-box;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.register-header {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 76px;
+    padding: 12px clamp(20px, 5vw, 72px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.register-brand {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.register-page {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px clamp(20px, 5vw, 72px) 48px;
+}
+
+.register-content {
+    width: 100%;
+    max-width: 1240px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: center;
+    gap: clamp(32px, 6vw, 88px);
+}
+
+/* =========================
+   INTRODUCTION
+   Text sits directly on the page background
+========================= */
+
+.register-visual {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.register-intro {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+    padding: 32px;
+    margin-top: auto;
+
+    /* Glass effect */
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(40, 25, 45, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.register-eyebrow {
+    margin: 0 0 12px;
+    color: var(--plum);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+.register-intro h1 {
+    margin: 0 0 16px;
+    color: var(--ink);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+    line-height: 1.12;
+}
+
+.register-intro h1 span {
+    display: block;
+    color: var(--rose);
+}
+
+.register-intro > p:last-child {
+    max-width: 500px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+/* =========================
+   SIGNUP FORM CARD
+========================= */
+
+.register-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 460px;
+    min-width: 0;
+    justify-self: center;
+    padding: clamp(24px, 3vw, 36px);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+}
+
+.register-card-heading {
+    margin-bottom: 24px;
+}
+
+.register-kicker {
+    margin: 0 0 8px;
+    color: var(--rose);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+}
+
+.register-card-heading h2 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.3rem);
+}
+
+.register-card-heading > p:last-child {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.register-error {
+    margin: 0 0 16px;
+    color: #b42318;
+    font-size: 0.9rem;
+}
+
+.register-card form {
+    display: grid;
+    gap: 15px;
+}
+
+.form-group {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    padding: 0 13px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.65);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.form-group input::placeholder {
+    color: #9a909d;
+}
+
+.form-group input:focus {
+    border-color: var(--violet);
+    box-shadow: 0 0 0 3px rgba(93, 60, 150, 0.1);
+}
+
+.register-button {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 5px;
+    padding: 11px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(100deg, var(--rose), var(--violet));
+    color: var(--white);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.register-button:hover {
+    filter: brightness(0.95);
+}
+
+.login-text {
+    margin: 20px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.login-text a {
+    color: var(--plum);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.login-text a:hover {
+    text-decoration: underline;
+}
